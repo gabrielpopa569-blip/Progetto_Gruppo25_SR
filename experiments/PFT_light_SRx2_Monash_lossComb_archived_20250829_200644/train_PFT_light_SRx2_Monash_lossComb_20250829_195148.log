@@ -1,0 +1,334 @@
+2025-08-29 19:51:48,977 INFO: 
+                ____                _       _____  ____
+               / __ ) ____ _ _____ (_)_____/ ___/ / __ \
+              / __  |/ __ `// ___// // ___/\__ \ / /_/ /
+             / /_/ // /_/ /(__  )/ // /__ ___/ // _, _/
+            /_____/ \__,_//____//_/ \___//____//_/ |_|
+     ______                   __   __                 __      __
+    / ____/____   ____   ____/ /  / /   __  __ _____ / /__   / /
+   / / __ / __ \ / __ \ / __  /  / /   / / / // ___// //_/  / /
+  / /_/ // /_/ // /_/ // /_/ /  / /___/ /_/ // /__ / /<    /_/
+  \____/ \____/ \____/ \____/  /_____/\____/ \___//_/|_|  (_)
+    
+Version Information: 
+	BasicSR: 0.1.1
+	PyTorch: 2.7.1+cu126
+	TorchVision: 0.22.1+cu126
+2025-08-29 19:51:48,977 INFO: 
+  name: PFT_light_SRx2_Monash_lossComb
+  model_type: PFTModel
+  scale: 2
+  num_gpu: 1
+  manual_seed: 0
+  find_unused_parameters: True
+  datasets:[
+    train:[
+      name: Monash_Guns_Dataset
+      type: PairedImageDataset
+      dataroot_gt: datasets/Monash_Guns_Dataset/HR
+      dataroot_lq: datasets/Monash_Guns_Dataset/LR
+      filename_tmpl: {}x2
+      io_backend:[
+        type: disk
+      ]
+      gt_size: 128
+      use_hflip: True
+      use_rot: True
+      num_worker_per_gpu: 8
+      batch_size_per_gpu: 8
+      dataset_enlarge_ratio: 1
+      prefetch_mode: cuda
+      pin_memory: True
+      persistent_workers: True
+      phase: train
+      scale: 2
+    ]
+    val_1:[
+      name: Set5
+      type: PairedImageDataset
+      dataroot_gt: datasets/TestDataSR/HR/Set5/x2
+      dataroot_lq: datasets/TestDataSR/LR/LRBI/Set5/x2
+      io_backend:[
+        type: disk
+      ]
+      phase: val
+      scale: 2
+    ]
+    val_2:[
+      name: Set14
+      type: PairedImageDataset
+      dataroot_gt: datasets/TestDataSR/HR/Set14/x2
+      dataroot_lq: datasets/TestDataSR/LR/LRBI/Set14/x2
+      io_backend:[
+        type: disk
+      ]
+      phase: val
+      scale: 2
+    ]
+    val_3:[
+      name: BSD100
+      type: PairedImageDataset
+      dataroot_gt: datasets/TestDataSR/HR/B100/x2
+      dataroot_lq: datasets/TestDataSR/LR/LRBI/B100/x2
+      io_backend:[
+        type: disk
+      ]
+      phase: val
+      scale: 2
+    ]
+  ]
+  network_g:[
+    type: PFT
+    upscale: 2
+    in_chans: 3
+    img_size: 64
+    embed_dim: 52
+    depths: [2, 4, 6, 6, 6]
+    num_heads: 4
+    num_topk: [1024, 1024, 256, 256, 256, 256, 128, 128, 128, 128, 128, 128, 64, 64, 64, 64, 64, 64, 32, 32, 32, 32, 32, 32]
+    window_size: 32
+    convffn_kernel_size: 7
+    img_range: 1.0
+    mlp_ratio: 1
+    upsampler: pixelshuffledirect
+    resi_connection: 1conv
+    use_checkpoint: False
+  ]
+  path:[
+    pretrain_network_g: None
+    strict_load_g: True
+    resume_state: None
+    experiments_root: /app/PFT-SR/experiments/PFT_light_SRx2_Monash_lossComb
+    models: /app/PFT-SR/experiments/PFT_light_SRx2_Monash_lossComb/models
+    training_states: /app/PFT-SR/experiments/PFT_light_SRx2_Monash_lossComb/training_states
+    log: /app/PFT-SR/experiments/PFT_light_SRx2_Monash_lossComb
+    visualization: /app/PFT-SR/experiments/PFT_light_SRx2_Monash_lossComb/visualization
+  ]
+  train:[
+    ema_decay: 0.999
+    optim_g:[
+      type: AdamW
+      lr: 0.0002
+      weight_decay: 0
+      betas: [0.9, 0.99]
+    ]
+    scheduler:[
+      type: MultiStepLR
+      milestones: [100000, 200000, 300000]
+      gamma: 0.5
+    ]
+    total_iter: 400000
+    warmup_iter: 2000
+    pixel_opt:[
+      type: L1PerceptualLoss
+      l1_weight: 1.0
+      perceptual_weight: 1.0
+      reduction: mean
+    ]
+  ]
+  val:[
+    val_freq: 10000.0
+    save_img: False
+    metrics:[
+      psnr:[
+        type: calculate_psnr
+        crop_border: 2
+        test_y_channel: True
+      ]
+      ssim:[
+        type: calculate_ssim
+        crop_border: 2
+        test_y_channel: True
+      ]
+    ]
+  ]
+  logger:[
+    print_freq: 100
+    save_checkpoint_freq: 10000.0
+    use_tb_logger: True
+    wandb:[
+      project: None
+      resume_id: None
+    ]
+  ]
+  dist_params:[
+    backend: nccl
+    port: 29500
+  ]
+  dist: False
+  rank: 0
+  world_size: 1
+  auto_resume: False
+  is_train: True
+  root_path: /app/PFT-SR
+
+2025-08-29 19:51:49,199 INFO: Dataset [PairedImageDataset] - Monash_Guns_Dataset is built.
+2025-08-29 19:51:49,199 INFO: Training statistics:
+	Number of train images: 2857
+	Dataset enlarge ratio: 1
+	Batch size per gpu: 8
+	World size (gpu number): 1
+	Require iter number per epoch: 358
+	Total epochs: 1118; iters: 400000.
+2025-08-29 19:51:49,199 INFO: Dataset [PairedImageDataset] - Set5 is built.
+2025-08-29 19:51:49,200 INFO: Number of val images/folders in Set5: 5
+2025-08-29 19:51:49,200 INFO: Dataset [PairedImageDataset] - Set14 is built.
+2025-08-29 19:51:49,200 INFO: Number of val images/folders in Set14: 14
+2025-08-29 19:51:49,205 INFO: Dataset [PairedImageDataset] - BSD100 is built.
+2025-08-29 19:51:49,205 INFO: Number of val images/folders in BSD100: 100
+2025-08-29 19:51:49,265 INFO: Network [PFT] is created.
+2025-08-29 19:51:49,413 INFO: Network: PFT, with parameters: 775,532
+2025-08-29 19:51:49,413 INFO: PFT(
+  (conv_first): Conv2d(3, 52, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (patch_embed): PatchEmbed(
+    (norm): LayerNorm((52,), eps=1e-05, elementwise_affine=True)
+  )
+  (patch_unembed): PatchUnEmbed()
+  (layers): ModuleList(
+    (0): PFTB(
+      (patch_embed): PatchEmbed()
+      (patch_unembed): PatchUnEmbed()
+      (residual_group): BasicBlock(
+        dim=52, input_resolution=(64, 64), depth=2
+        (layers): ModuleList(
+          (0-1): 2 x PFTransformerLayer(
+            (softmax): Softmax(dim=-1)
+            (lrelu): LeakyReLU(negative_slope=0.01)
+            (sigmoid): Sigmoid()
+            (norm1): LayerNorm((52,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((52,), eps=1e-05, elementwise_affine=True)
+            (wqkv): Linear(in_features=52, out_features=156, bias=True)
+            (v_LePE): dwconv(
+              (depthwise_conv): Sequential(
+                (0): Conv2d(52, 52, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=52)
+                (1): GELU(approximate='none')
+              )
+            )
+            (attn_win): WindowAttention(
+              dim=52, window_size=(32, 32), num_heads=4, qkv_bias=True
+              (proj): Linear(in_features=52, out_features=52, bias=True)
+              (softmax): Softmax(dim=-1)
+            )
+            (convffn): ConvFFN(
+              (fc1): Linear(in_features=52, out_features=52, bias=True)
+              (act): GELU(approximate='none')
+              (dwconv): dwconv(
+                (depthwise_conv): Sequential(
+                  (0): Conv2d(52, 52, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=52)
+                  (1): GELU(approximate='none')
+                )
+              )
+              (fc2): Linear(in_features=52, out_features=52, bias=True)
+            )
+          )
+        )
+      )
+      (conv): Conv2d(52, 52, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+    (1): PFTB(
+      (patch_embed): PatchEmbed()
+      (patch_unembed): PatchUnEmbed()
+      (residual_group): BasicBlock(
+        dim=52, input_resolution=(64, 64), depth=4
+        (layers): ModuleList(
+          (0-3): 4 x PFTransformerLayer(
+            (softmax): Softmax(dim=-1)
+            (lrelu): LeakyReLU(negative_slope=0.01)
+            (sigmoid): Sigmoid()
+            (norm1): LayerNorm((52,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((52,), eps=1e-05, elementwise_affine=True)
+            (wqkv): Linear(in_features=52, out_features=156, bias=True)
+            (v_LePE): dwconv(
+              (depthwise_conv): Sequential(
+                (0): Conv2d(52, 52, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=52)
+                (1): GELU(approximate='none')
+              )
+            )
+            (attn_win): WindowAttention(
+              dim=52, window_size=(32, 32), num_heads=4, qkv_bias=True
+              (proj): Linear(in_features=52, out_features=52, bias=True)
+              (softmax): Softmax(dim=-1)
+            )
+            (convffn): ConvFFN(
+              (fc1): Linear(in_features=52, out_features=52, bias=True)
+              (act): GELU(approximate='none')
+              (dwconv): dwconv(
+                (depthwise_conv): Sequential(
+                  (0): Conv2d(52, 52, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=52)
+                  (1): GELU(approximate='none')
+                )
+              )
+              (fc2): Linear(in_features=52, out_features=52, bias=True)
+            )
+          )
+        )
+      )
+      (conv): Conv2d(52, 52, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+    (2-4): 3 x PFTB(
+      (patch_embed): PatchEmbed()
+      (patch_unembed): PatchUnEmbed()
+      (residual_group): BasicBlock(
+        dim=52, input_resolution=(64, 64), depth=6
+        (layers): ModuleList(
+          (0-5): 6 x PFTransformerLayer(
+            (softmax): Softmax(dim=-1)
+            (lrelu): LeakyReLU(negative_slope=0.01)
+            (sigmoid): Sigmoid()
+            (norm1): LayerNorm((52,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((52,), eps=1e-05, elementwise_affine=True)
+            (wqkv): Linear(in_features=52, out_features=156, bias=True)
+            (v_LePE): dwconv(
+              (depthwise_conv): Sequential(
+                (0): Conv2d(52, 52, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=52)
+                (1): GELU(approximate='none')
+              )
+            )
+            (attn_win): WindowAttention(
+              dim=52, window_size=(32, 32), num_heads=4, qkv_bias=True
+              (proj): Linear(in_features=52, out_features=52, bias=True)
+              (softmax): Softmax(dim=-1)
+            )
+            (convffn): ConvFFN(
+              (fc1): Linear(in_features=52, out_features=52, bias=True)
+              (act): GELU(approximate='none')
+              (dwconv): dwconv(
+                (depthwise_conv): Sequential(
+                  (0): Conv2d(52, 52, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=52)
+                  (1): GELU(approximate='none')
+                )
+              )
+              (fc2): Linear(in_features=52, out_features=52, bias=True)
+            )
+          )
+        )
+      )
+      (conv): Conv2d(52, 52, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (norm): LayerNorm((52,), eps=1e-05, elementwise_affine=True)
+  (conv_after_body): Conv2d(52, 52, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (upsample): UpsampleOneStep(
+    (0): Conv2d(52, 12, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): PixelShuffle(upscale_factor=2)
+  )
+)
+2025-08-29 19:51:49,416 INFO: Use Exponential Moving Average with decay: 0.999
+2025-08-29 19:51:49,468 INFO: Network [PFT] is created.
+2025-08-29 19:51:50,810 INFO: Loss [L1PerceptualLoss] is created.
+2025-08-29 19:51:50,812 INFO: Model [PFTModel] is created.
+2025-08-29 19:51:50,967 INFO: Use cuda prefetch dataloader
+2025-08-29 19:51:50,967 INFO: Start training from epoch: 0, iter: 0
+2025-08-29 19:52:53,674 INFO: [PFT_l..][epoch:  0, iter:     100, lr:(1.000e-05,)] [eta: 2 days, 18:53:36, time (data): 0.627 (0.002)] l_pix: 9.3956e-02 
+2025-08-29 19:53:55,450 INFO: [PFT_l..][epoch:  0, iter:     200, lr:(2.000e-05,)] [eta: 2 days, 19:44:12, time (data): 0.622 (0.001)] l_pix: 6.9689e-02 
+2025-08-29 19:54:57,194 INFO: [PFT_l..][epoch:  0, iter:     300, lr:(3.000e-05,)] [eta: 2 days, 19:59:48, time (data): 0.617 (0.000)] l_pix: 5.3018e-02 
+2025-08-29 19:55:58,537 INFO: [PFT_l..][epoch:  1, iter:     400, lr:(4.000e-05,)] [eta: 2 days, 20:00:26, time (data): 0.615 (0.001)] l_pix: 3.6147e-02 
+2025-08-29 19:56:59,475 INFO: [PFT_l..][epoch:  1, iter:     500, lr:(5.000e-05,)] [eta: 2 days, 19:55:01, time (data): 0.609 (0.001)] l_pix: 2.6740e-02 
+2025-08-29 19:58:00,209 INFO: [PFT_l..][epoch:  1, iter:     600, lr:(6.000e-05,)] [eta: 2 days, 19:48:49, time (data): 0.608 (0.001)] l_pix: 2.5673e-02 
+2025-08-29 19:59:00,915 INFO: [PFT_l..][epoch:  1, iter:     700, lr:(7.000e-05,)] [eta: 2 days, 19:43:50, time (data): 0.607 (0.000)] l_pix: 2.7340e-02 
+2025-08-29 20:00:01,574 INFO: [PFT_l..][epoch:  2, iter:     800, lr:(8.000e-05,)] [eta: 2 days, 19:39:26, time (data): 0.607 (0.001)] l_pix: 2.5536e-02 
+2025-08-29 20:01:02,192 INFO: [PFT_l..][epoch:  2, iter:     900, lr:(9.000e-05,)] [eta: 2 days, 19:35:30, time (data): 0.606 (0.000)] l_pix: 1.9185e-02 
+2025-08-29 20:02:02,708 INFO: [PFT_l..][epoch:  2, iter:   1,000, lr:(1.000e-04,)] [eta: 2 days, 19:31:28, time (data): 0.606 (0.000)] l_pix: 2.5921e-02 
+2025-08-29 20:03:03,274 INFO: [PFT_l..][epoch:  3, iter:   1,100, lr:(1.100e-04,)] [eta: 2 days, 19:28:17, time (data): 0.606 (0.001)] l_pix: 2.0403e-02 
+2025-08-29 20:04:03,653 INFO: [PFT_l..][epoch:  3, iter:   1,200, lr:(1.200e-04,)] [eta: 2 days, 19:24:26, time (data): 0.605 (0.001)] l_pix: 1.8753e-02 
+2025-08-29 20:05:03,910 INFO: [PFT_l..][epoch:  3, iter:   1,300, lr:(1.300e-04,)] [eta: 2 days, 19:20:24, time (data): 0.603 (0.000)] l_pix: 2.4669e-02 

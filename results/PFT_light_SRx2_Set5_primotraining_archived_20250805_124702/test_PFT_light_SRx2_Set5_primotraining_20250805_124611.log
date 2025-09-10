@@ -1,0 +1,115 @@
+2025-08-05 12:46:11,183 INFO: 
+                ____                _       _____  ____
+               / __ ) ____ _ _____ (_)_____/ ___/ / __ \
+              / __  |/ __ `// ___// // ___/\__ \ / /_/ /
+             / /_/ // /_/ /(__  )/ // /__ ___/ // _, _/
+            /_____/ \__,_//____//_/ \___//____//_/ |_|
+     ______                   __   __                 __      __
+    / ____/____   ____   ____/ /  / /   __  __ _____ / /__   / /
+   / / __ / __ \ / __ \ / __  /  / /   / / / // ___// //_/  / /
+  / /_/ // /_/ // /_/ // /_/ /  / /___/ /_/ // /__ / /<    /_/
+  \____/ \____/ \____/ \____/  /_____/\____/ \___//_/|_|  (_)
+    
+Version Information: 
+	BasicSR: 0.1.1
+	PyTorch: 2.7.1+cu126
+	TorchVision: 0.22.1+cu126
+2025-08-05 12:46:11,183 INFO: 
+  name: PFT_light_SRx2_Set5_primotraining
+  model_type: PFTModel
+  scale: 2
+  num_gpu: 1
+  manual_seed: 0
+  datasets:[
+    test_1:[
+      name: Set5
+      type: PairedImageDataset
+      dataroot_gt: datasets/TestDataSR/HR/Set5/x2
+      dataroot_lq: datasets/TestDataSR/LR/LRBI/Set5/x2
+      io_backend:[
+        type: disk
+      ]
+      phase: test
+      scale: 2
+    ]
+    test_2:[
+      name: Set14
+      type: PairedImageDataset
+      dataroot_gt: datasets/TestDataSR/HR/Set14/x2
+      dataroot_lq: datasets/TestDataSR/LR/LRBI/Set14/x2
+      io_backend:[
+        type: disk
+      ]
+      phase: test
+      scale: 2
+    ]
+    test_3:[
+      name: BSD100
+      type: PairedImageDataset
+      dataroot_gt: datasets/TestDataSR/HR/B100/x2
+      dataroot_lq: datasets/TestDataSR/LR/LRBI/B100/x2
+      io_backend:[
+        type: disk
+      ]
+      phase: test
+      scale: 2
+    ]
+    test_4:[
+      name: Urban100
+      type: PairedImageDataset
+      dataroot_gt: datasets/TestDataSR/HR/Urban100/x2
+      dataroot_lq: datasets/TestDataSR/LR/LRBI/Urban100/x2
+      io_backend:[
+        type: disk
+      ]
+      phase: test
+      scale: 2
+    ]
+  ]
+  network_g:[
+    type: PFT
+    upscale: 2
+    in_chans: 3
+    img_size: 64
+    embed_dim: 52
+    depths: [2, 4, 6, 6, 6]
+    num_heads: 4
+    num_topk: [1024, 1024, 256, 256, 256, 256, 128, 128, 128, 128, 128, 128, 64, 64, 64, 64, 64, 64, 32, 32, 32, 32, 32, 32]
+    window_size: 32
+    convffn_kernel_size: 7
+    img_range: 1.0
+    mlp_ratio: 1
+    upsampler: pixelshuffledirect
+    resi_connection: 1conv
+    use_checkpoint: False
+  ]
+  path:[
+    pretrain_network_g: experiments/PFT_light_SRx2_Set5_primotraining/models/net_g_80000.pth
+    strict_load_g: True
+    param_key_g: params_ema
+    results_root: /app/PFT-SR/results/PFT_light_SRx2_Set5_primotraining
+    log: /app/PFT-SR/results/PFT_light_SRx2_Set5_primotraining
+    visualization: /app/PFT-SR/results/PFT_light_SRx2_Set5_primotraining/visualization
+  ]
+  val:[
+    save_img: True
+    suffix: None
+    metrics:[
+      psnr:[
+        type: calculate_psnr
+        crop_border: 2
+        test_y_channel: True
+      ]
+      ssim:[
+        type: calculate_ssim
+        crop_border: 2
+        test_y_channel: True
+      ]
+    ]
+  ]
+  dist: False
+  rank: 0
+  world_size: 1
+  auto_resume: False
+  is_train: False
+

@@ -1,0 +1,340 @@
+2025-08-04 21:43:53,059 INFO: 
+                ____                _       _____  ____
+               / __ ) ____ _ _____ (_)_____/ ___/ / __ \
+              / __  |/ __ `// ___// // ___/\__ \ / /_/ /
+             / /_/ // /_/ /(__  )/ // /__ ___/ // _, _/
+            /_____/ \__,_//____//_/ \___//____//_/ |_|
+     ______                   __   __                 __      __
+    / ____/____   ____   ____/ /  / /   __  __ _____ / /__   / /
+   / / __ / __ \ / __ \ / __  /  / /   / / / // ___// //_/  / /
+  / /_/ // /_/ // /_/ // /_/ /  / /___/ /_/ // /__ / /<    /_/
+  \____/ \____/ \____/ \____/  /_____/\____/ \___//_/|_|  (_)
+    
+Version Information: 
+	BasicSR: 0.1.1
+	PyTorch: 2.7.1+cu126
+	TorchVision: 0.22.1+cu126
+2025-08-04 21:43:53,059 INFO: 
+  name: PFT_light_SRx2_Set5_primotraining
+  model_type: PFTModel
+  scale: 2
+  num_gpu: 1
+  manual_seed: 0
+  find_unused_parameters: True
+  datasets:[
+    train:[
+      name: Set5Training
+      type: PairedImageDataset
+      dataroot_gt: datasets/TestDataSR/HR/Set5/x2
+      dataroot_lq: datasets/TestDataSR/LR/LRBI/Set5/x2
+      filename_tmpl: {}x2
+      io_backend:[
+        type: disk
+      ]
+      gt_size: 128
+      use_hflip: True
+      use_rot: True
+      num_worker_per_gpu: 5
+      batch_size_per_gpu: 5
+      dataset_enlarge_ratio: 1
+      prefetch_mode: cuda
+      pin_memory: True
+      persistent_workers: True
+      phase: train
+      scale: 2
+    ]
+    val_1:[
+      name: Set5Testing
+      type: PairedImageDataset
+      dataroot_gt: datasets/TestDataSR1/HR/Set5/x2
+      dataroot_lq: datasets/TestDataSR1/LR/LRBI/Set5/x2
+      io_backend:[
+        type: disk
+      ]
+      phase: val
+      scale: 2
+    ]
+  ]
+  network_g:[
+    type: PFT
+    upscale: 2
+    in_chans: 3
+    img_size: 64
+    embed_dim: 52
+    depths: [2, 4, 6, 6, 6]
+    num_heads: 4
+    num_topk: [1024, 1024, 256, 256, 256, 256, 128, 128, 128, 128, 128, 128, 64, 64, 64, 64, 64, 64, 32, 32, 32, 32, 32, 32]
+    window_size: 32
+    convffn_kernel_size: 7
+    img_range: 1.0
+    mlp_ratio: 1
+    upsampler: pixelshuffledirect
+    resi_connection: 1conv
+    use_checkpoint: False
+  ]
+  path:[
+    pretrain_network_g: None
+    strict_load_g: True
+    resume_state: None
+    experiments_root: /app/PFT-SR/experiments/PFT_light_SRx2_Set5_primotraining
+    models: /app/PFT-SR/experiments/PFT_light_SRx2_Set5_primotraining/models
+    training_states: /app/PFT-SR/experiments/PFT_light_SRx2_Set5_primotraining/training_states
+    log: /app/PFT-SR/experiments/PFT_light_SRx2_Set5_primotraining
+    visualization: /app/PFT-SR/experiments/PFT_light_SRx2_Set5_primotraining/visualization
+  ]
+  train:[
+    ema_decay: 0.999
+    optim_g:[
+      type: AdamW
+      lr: 0.0005
+      weight_decay: 0
+      betas: [0.9, 0.99]
+    ]
+    scheduler:[
+      type: MultiStepLR
+      milestones: [250000, 400000, 450000, 475000, 490000]
+      gamma: 0.5
+    ]
+    total_iter: 500000
+    warmup_iter: 20000
+    pixel_opt:[
+      type: L1Loss
+      loss_weight: 1.0
+      reduction: mean
+    ]
+  ]
+  val:[
+    val_freq: 10000.0
+    save_img: False
+    metrics:[
+      psnr:[
+        type: calculate_psnr
+        crop_border: 2
+        test_y_channel: True
+      ]
+      ssim:[
+        type: calculate_ssim
+        crop_border: 2
+        test_y_channel: True
+      ]
+    ]
+  ]
+  logger:[
+    print_freq: 100
+    save_checkpoint_freq: 10000.0
+    use_tb_logger: True
+    wandb:[
+      project: None
+      resume_id: None
+    ]
+  ]
+  dist_params:[
+    backend: nccl
+    port: 29500
+  ]
+  dist: False
+  rank: 0
+  world_size: 1
+  auto_resume: False
+  is_train: True
+  root_path: /app/PFT-SR
+
+2025-08-04 21:43:53,115 INFO: Dataset [PairedImageDataset] - Set5Training is built.
+2025-08-04 21:43:53,116 INFO: Training statistics:
+	Number of train images: 5
+	Dataset enlarge ratio: 1
+	Batch size per gpu: 5
+	World size (gpu number): 1
+	Require iter number per epoch: 1
+	Total epochs: 500000; iters: 500000.
+2025-08-04 21:43:53,116 INFO: Dataset [PairedImageDataset] - Set5Testing is built.
+2025-08-04 21:43:53,116 INFO: Number of val images/folders in Set5Testing: 5
+2025-08-04 21:43:53,177 INFO: Network [PFT] is created.
+2025-08-04 21:43:53,300 INFO: Network: PFT, with parameters: 775,532
+2025-08-04 21:43:53,300 INFO: PFT(
+  (conv_first): Conv2d(3, 52, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (patch_embed): PatchEmbed(
+    (norm): LayerNorm((52,), eps=1e-05, elementwise_affine=True)
+  )
+  (patch_unembed): PatchUnEmbed()
+  (layers): ModuleList(
+    (0): PFTB(
+      (patch_embed): PatchEmbed()
+      (patch_unembed): PatchUnEmbed()
+      (residual_group): BasicBlock(
+        dim=52, input_resolution=(64, 64), depth=2
+        (layers): ModuleList(
+          (0-1): 2 x PFTransformerLayer(
+            (softmax): Softmax(dim=-1)
+            (lrelu): LeakyReLU(negative_slope=0.01)
+            (sigmoid): Sigmoid()
+            (norm1): LayerNorm((52,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((52,), eps=1e-05, elementwise_affine=True)
+            (wqkv): Linear(in_features=52, out_features=156, bias=True)
+            (v_LePE): dwconv(
+              (depthwise_conv): Sequential(
+                (0): Conv2d(52, 52, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=52)
+                (1): GELU(approximate='none')
+              )
+            )
+            (attn_win): WindowAttention(
+              dim=52, window_size=(32, 32), num_heads=4, qkv_bias=True
+              (proj): Linear(in_features=52, out_features=52, bias=True)
+              (softmax): Softmax(dim=-1)
+            )
+            (convffn): ConvFFN(
+              (fc1): Linear(in_features=52, out_features=52, bias=True)
+              (act): GELU(approximate='none')
+              (dwconv): dwconv(
+                (depthwise_conv): Sequential(
+                  (0): Conv2d(52, 52, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=52)
+                  (1): GELU(approximate='none')
+                )
+              )
+              (fc2): Linear(in_features=52, out_features=52, bias=True)
+            )
+          )
+        )
+      )
+      (conv): Conv2d(52, 52, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+    (1): PFTB(
+      (patch_embed): PatchEmbed()
+      (patch_unembed): PatchUnEmbed()
+      (residual_group): BasicBlock(
+        dim=52, input_resolution=(64, 64), depth=4
+        (layers): ModuleList(
+          (0-3): 4 x PFTransformerLayer(
+            (softmax): Softmax(dim=-1)
+            (lrelu): LeakyReLU(negative_slope=0.01)
+            (sigmoid): Sigmoid()
+            (norm1): LayerNorm((52,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((52,), eps=1e-05, elementwise_affine=True)
+            (wqkv): Linear(in_features=52, out_features=156, bias=True)
+            (v_LePE): dwconv(
+              (depthwise_conv): Sequential(
+                (0): Conv2d(52, 52, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=52)
+                (1): GELU(approximate='none')
+              )
+            )
+            (attn_win): WindowAttention(
+              dim=52, window_size=(32, 32), num_heads=4, qkv_bias=True
+              (proj): Linear(in_features=52, out_features=52, bias=True)
+              (softmax): Softmax(dim=-1)
+            )
+            (convffn): ConvFFN(
+              (fc1): Linear(in_features=52, out_features=52, bias=True)
+              (act): GELU(approximate='none')
+              (dwconv): dwconv(
+                (depthwise_conv): Sequential(
+                  (0): Conv2d(52, 52, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=52)
+                  (1): GELU(approximate='none')
+                )
+              )
+              (fc2): Linear(in_features=52, out_features=52, bias=True)
+            )
+          )
+        )
+      )
+      (conv): Conv2d(52, 52, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+    (2-4): 3 x PFTB(
+      (patch_embed): PatchEmbed()
+      (patch_unembed): PatchUnEmbed()
+      (residual_group): BasicBlock(
+        dim=52, input_resolution=(64, 64), depth=6
+        (layers): ModuleList(
+          (0-5): 6 x PFTransformerLayer(
+            (softmax): Softmax(dim=-1)
+            (lrelu): LeakyReLU(negative_slope=0.01)
+            (sigmoid): Sigmoid()
+            (norm1): LayerNorm((52,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((52,), eps=1e-05, elementwise_affine=True)
+            (wqkv): Linear(in_features=52, out_features=156, bias=True)
+            (v_LePE): dwconv(
+              (depthwise_conv): Sequential(
+                (0): Conv2d(52, 52, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=52)
+                (1): GELU(approximate='none')
+              )
+            )
+            (attn_win): WindowAttention(
+              dim=52, window_size=(32, 32), num_heads=4, qkv_bias=True
+              (proj): Linear(in_features=52, out_features=52, bias=True)
+              (softmax): Softmax(dim=-1)
+            )
+            (convffn): ConvFFN(
+              (fc1): Linear(in_features=52, out_features=52, bias=True)
+              (act): GELU(approximate='none')
+              (dwconv): dwconv(
+                (depthwise_conv): Sequential(
+                  (0): Conv2d(52, 52, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=52)
+                  (1): GELU(approximate='none')
+                )
+              )
+              (fc2): Linear(in_features=52, out_features=52, bias=True)
+            )
+          )
+        )
+      )
+      (conv): Conv2d(52, 52, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (norm): LayerNorm((52,), eps=1e-05, elementwise_affine=True)
+  (conv_after_body): Conv2d(52, 52, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (upsample): UpsampleOneStep(
+    (0): Conv2d(52, 12, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): PixelShuffle(upscale_factor=2)
+  )
+)
+2025-08-04 21:43:53,303 INFO: Use Exponential Moving Average with decay: 0.999
+2025-08-04 21:43:53,355 INFO: Network [PFT] is created.
+2025-08-04 21:43:53,394 INFO: Loss [L1Loss] is created.
+2025-08-04 21:43:53,396 INFO: Model [PFTModel] is created.
+2025-08-04 21:43:53,496 INFO: Use cuda prefetch dataloader
+2025-08-04 21:43:53,497 INFO: Start training from epoch: 0, iter: 0
+2025-08-04 21:43:54,914 INFO: Save the latest model.
+2025-08-04 21:43:57,161 INFO: Validation Set5Testing
+	 # psnr: 11.3454	Best: 11.3454 @ 1 iter
+	 # ssim: 0.0391	Best: 0.0391 @ 1 iter
+
+2025-08-04 21:43:57,583 INFO: Save the latest model.
+2025-08-04 21:43:59,996 INFO: Validation Set5Testing
+	 # psnr: 11.3454	Best: 11.3454 @ 2 iter
+	 # ssim: 0.0391	Best: 0.0391 @ 2 iter
+
+2025-08-04 21:44:00,423 INFO: Save the latest model.
+2025-08-04 21:44:02,981 INFO: Validation Set5Testing
+	 # psnr: 11.3455	Best: 11.3455 @ 3 iter
+	 # ssim: 0.0391	Best: 0.0391 @ 2 iter
+
+2025-08-04 21:44:03,419 INFO: Save the latest model.
+2025-08-04 21:44:05,812 INFO: Validation Set5Testing
+	 # psnr: 11.3455	Best: 11.3455 @ 4 iter
+	 # ssim: 0.0391	Best: 0.0391 @ 4 iter
+
+2025-08-04 21:44:06,264 INFO: Save the latest model.
+2025-08-04 21:44:08,645 INFO: Validation Set5Testing
+	 # psnr: 11.3455	Best: 11.3455 @ 5 iter
+	 # ssim: 0.0391	Best: 0.0391 @ 4 iter
+
+2025-08-04 21:44:09,086 INFO: Save the latest model.
+2025-08-04 21:44:11,508 INFO: Validation Set5Testing
+	 # psnr: 11.3455	Best: 11.3455 @ 6 iter
+	 # ssim: 0.0391	Best: 0.0391 @ 6 iter
+
+2025-08-04 21:44:11,960 INFO: Save the latest model.
+2025-08-04 21:44:14,356 INFO: Validation Set5Testing
+	 # psnr: 11.3455	Best: 11.3455 @ 7 iter
+	 # ssim: 0.0391	Best: 0.0391 @ 7 iter
+
+2025-08-04 21:44:14,778 INFO: Save the latest model.
+2025-08-04 21:44:17,190 INFO: Validation Set5Testing
+	 # psnr: 11.3455	Best: 11.3455 @ 8 iter
+	 # ssim: 0.0391	Best: 0.0391 @ 8 iter
+
+2025-08-04 21:44:17,611 INFO: Save the latest model.
+2025-08-04 21:44:20,011 INFO: Validation Set5Testing
+	 # psnr: 11.3455	Best: 11.3455 @ 9 iter
+	 # ssim: 0.0391	Best: 0.0391 @ 9 iter
+
+2025-08-04 21:44:20,431 INFO: Save the latest model.

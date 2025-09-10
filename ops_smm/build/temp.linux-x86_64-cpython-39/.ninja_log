@@ -1,0 +1,6 @@
+# ninja log v5
+0	145288	1754320016233318337	/app/PFT-SR/ops_smm/build/temp.linux-x86_64-cpython-39/app/PFT-SR/ops_smm/src/smm_cuda.o	49025744ece03
+0	144839	1754320031273129260	/app/PFT-SR/ops_smm/build/temp.linux-x86_64-cpython-39/app/PFT-SR/ops_smm/src/smm_cuda.o	49025744ece03
+4	141867	1754320244274456535	/app/PFT-SR/ops_smm/build/temp.linux-x86_64-cpython-39/app/PFT-SR/ops_smm/src/smm_cuda.o	49025744ece03
+29	143512	1754338904839421796	/app/PFT-SR/ops_smm/build/temp.linux-x86_64-cpython-39/app/PFT-SR/ops_smm/src/smm_cuda.o	49025744ece03
+45	164336	1754340050432233694	/app/PFT-SR/ops_smm/build/temp.linux-x86_64-cpython-39/app/PFT-SR/ops_smm/src/smm_cuda.o	5822eade6096c57e

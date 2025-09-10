@@ -1,0 +1,418 @@
+2025-09-09 11:45:26,482 INFO: 
+                ____                _       _____  ____
+               / __ ) ____ _ _____ (_)_____/ ___/ / __ \
+              / __  |/ __ `// ___// // ___/\__ \ / /_/ /
+             / /_/ // /_/ /(__  )/ // /__ ___/ // _, _/
+            /_____/ \__,_//____//_/ \___//____//_/ |_|
+     ______                   __   __                 __      __
+    / ____/____   ____   ____/ /  / /   __  __ _____ / /__   / /
+   / / __ / __ \ / __ \ / __  /  / /   / / / // ___// //_/  / /
+  / /_/ // /_/ // /_/ // /_/ /  / /___/ /_/ // /__ / /<    /_/
+  \____/ \____/ \____/ \____/  /_____/\____/ \___//_/|_|  (_)
+    
+Version Information: 
+	BasicSR: 0.1.1
+	PyTorch: 2.7.1+cu126
+	TorchVision: 0.22.1+cu126
+2025-09-09 11:45:26,482 INFO: 
+  name: PFT_light_SRx2_Monash_lossL1
+  model_type: PFTModel
+  scale: 2
+  num_gpu: 1
+  manual_seed: 0
+  find_unused_parameters: True
+  datasets:[
+    train:[
+      name: Monash_Guns_Dataset
+      type: PairedImageDataset
+      dataroot_gt: datasets/Monash_Guns_Dataset/HR
+      dataroot_lq: datasets/Monash_Guns_Dataset/LR
+      filename_tmpl: {}x2
+      io_backend:[
+        type: disk
+      ]
+      gt_size: 128
+      use_hflip: True
+      use_rot: True
+      num_worker_per_gpu: 8
+      batch_size_per_gpu: 8
+      dataset_enlarge_ratio: 1
+      prefetch_mode: cuda
+      pin_memory: True
+      persistent_workers: True
+      phase: train
+      scale: 2
+    ]
+    val_0:[
+      name: Monash_Guns_Dataset
+      type: PairedImageDataset
+      dataroot_gt: datasets/Monash_Guns_Dataset_Validation/HR
+      dataroot_lq: datasets/Monash_Guns_Dataset_Validation/LR
+      io_backend:[
+        type: disk
+      ]
+      phase: val
+      scale: 2
+    ]
+    val_1:[
+      name: Set5
+      type: PairedImageDataset
+      dataroot_gt: datasets/TestDataSR/HR/Set5/x2
+      dataroot_lq: datasets/TestDataSR/LR/LRBI/Set5/x2
+      io_backend:[
+        type: disk
+      ]
+      phase: val
+      scale: 2
+    ]
+    val_2:[
+      name: Set14
+      type: PairedImageDataset
+      dataroot_gt: datasets/TestDataSR/HR/Set14/x2
+      dataroot_lq: datasets/TestDataSR/LR/LRBI/Set14/x2
+      io_backend:[
+        type: disk
+      ]
+      phase: val
+      scale: 2
+    ]
+    val_3:[
+      name: BSD100
+      type: PairedImageDataset
+      dataroot_gt: datasets/TestDataSR/HR/B100/x2
+      dataroot_lq: datasets/TestDataSR/LR/LRBI/B100/x2
+      io_backend:[
+        type: disk
+      ]
+      phase: val
+      scale: 2
+    ]
+  ]
+  network_g:[
+    type: PFT
+    upscale: 2
+    in_chans: 3
+    img_size: 64
+    embed_dim: 52
+    depths: [2, 4, 6, 6, 6]
+    num_heads: 4
+    num_topk: [1024, 1024, 256, 256, 256, 256, 128, 128, 128, 128, 128, 128, 64, 64, 64, 64, 64, 64, 32, 32, 32, 32, 32, 32]
+    window_size: 32
+    convffn_kernel_size: 7
+    img_range: 1.0
+    mlp_ratio: 1
+    upsampler: pixelshuffledirect
+    resi_connection: 1conv
+    use_checkpoint: False
+  ]
+  path:[
+    pretrain_network_g: None
+    strict_load_g: True
+    resume_state: None
+    experiments_root: /app/PFT-SR/experiments/PFT_light_SRx2_Monash_lossL1
+    models: /app/PFT-SR/experiments/PFT_light_SRx2_Monash_lossL1/models
+    training_states: /app/PFT-SR/experiments/PFT_light_SRx2_Monash_lossL1/training_states
+    log: /app/PFT-SR/experiments/PFT_light_SRx2_Monash_lossL1
+    visualization: /app/PFT-SR/experiments/PFT_light_SRx2_Monash_lossL1/visualization
+  ]
+  train:[
+    ema_decay: 0.999
+    optim_g:[
+      type: AdamW
+      lr: 0.0002
+      weight_decay: 0
+      betas: [0.9, 0.99]
+    ]
+    scheduler:[
+      type: MultiStepLR
+      milestones: [100000, 200000, 300000]
+      gamma: 0.5
+    ]
+    total_iter: 400000
+    warmup_iter: 2000
+    pixel_opt:[
+      type: L1Loss
+      loss_weight: 1.0
+      reduction: mean
+    ]
+  ]
+  val:[
+    val_freq: 10000.0
+    save_img: False
+    metrics:[
+      psnr:[
+        type: calculate_psnr
+        crop_border: 2
+        test_y_channel: True
+      ]
+      ssim:[
+        type: calculate_ssim
+        crop_border: 2
+        test_y_channel: True
+      ]
+    ]
+  ]
+  logger:[
+    print_freq: 100
+    save_checkpoint_freq: 10000.0
+    use_tb_logger: True
+    wandb:[
+      project: None
+      resume_id: None
+    ]
+  ]
+  dist_params:[
+    backend: nccl
+    port: 29500
+  ]
+  dist: False
+  rank: 0
+  world_size: 1
+  auto_resume: False
+  is_train: True
+  root_path: /app/PFT-SR
+
+2025-09-09 11:45:26,637 INFO: Dataset [PairedImageDataset] - Monash_Guns_Dataset is built.
+2025-09-09 11:45:26,637 INFO: Training statistics:
+	Number of train images: 1957
+	Dataset enlarge ratio: 1
+	Batch size per gpu: 8
+	World size (gpu number): 1
+	Require iter number per epoch: 245
+	Total epochs: 1633; iters: 400000.
+2025-09-09 11:45:26,655 INFO: Dataset [PairedImageDataset] - Monash_Guns_Dataset is built.
+2025-09-09 11:45:26,655 INFO: Number of val images/folders in Monash_Guns_Dataset: 450
+2025-09-09 11:45:26,656 INFO: Dataset [PairedImageDataset] - Set5 is built.
+2025-09-09 11:45:26,656 INFO: Number of val images/folders in Set5: 5
+2025-09-09 11:45:26,656 INFO: Dataset [PairedImageDataset] - Set14 is built.
+2025-09-09 11:45:26,656 INFO: Number of val images/folders in Set14: 14
+2025-09-09 11:45:26,661 INFO: Dataset [PairedImageDataset] - BSD100 is built.
+2025-09-09 11:45:26,661 INFO: Number of val images/folders in BSD100: 100
+2025-09-09 11:45:26,713 INFO: Network [PFT] is created.
+2025-09-09 11:45:26,851 INFO: Network: PFT, with parameters: 775,532
+2025-09-09 11:45:26,851 INFO: PFT(
+  (conv_first): Conv2d(3, 52, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (patch_embed): PatchEmbed(
+    (norm): LayerNorm((52,), eps=1e-05, elementwise_affine=True)
+  )
+  (patch_unembed): PatchUnEmbed()
+  (layers): ModuleList(
+    (0): PFTB(
+      (patch_embed): PatchEmbed()
+      (patch_unembed): PatchUnEmbed()
+      (residual_group): BasicBlock(
+        dim=52, input_resolution=(64, 64), depth=2
+        (layers): ModuleList(
+          (0-1): 2 x PFTransformerLayer(
+            (softmax): Softmax(dim=-1)
+            (lrelu): LeakyReLU(negative_slope=0.01)
+            (sigmoid): Sigmoid()
+            (norm1): LayerNorm((52,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((52,), eps=1e-05, elementwise_affine=True)
+            (wqkv): Linear(in_features=52, out_features=156, bias=True)
+            (v_LePE): dwconv(
+              (depthwise_conv): Sequential(
+                (0): Conv2d(52, 52, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=52)
+                (1): GELU(approximate='none')
+              )
+            )
+            (attn_win): WindowAttention(
+              dim=52, window_size=(32, 32), num_heads=4, qkv_bias=True
+              (proj): Linear(in_features=52, out_features=52, bias=True)
+              (softmax): Softmax(dim=-1)
+            )
+            (convffn): ConvFFN(
+              (fc1): Linear(in_features=52, out_features=52, bias=True)
+              (act): GELU(approximate='none')
+              (dwconv): dwconv(
+                (depthwise_conv): Sequential(
+                  (0): Conv2d(52, 52, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=52)
+                  (1): GELU(approximate='none')
+                )
+              )
+              (fc2): Linear(in_features=52, out_features=52, bias=True)
+            )
+          )
+        )
+      )
+      (conv): Conv2d(52, 52, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+    (1): PFTB(
+      (patch_embed): PatchEmbed()
+      (patch_unembed): PatchUnEmbed()
+      (residual_group): BasicBlock(
+        dim=52, input_resolution=(64, 64), depth=4
+        (layers): ModuleList(
+          (0-3): 4 x PFTransformerLayer(
+            (softmax): Softmax(dim=-1)
+            (lrelu): LeakyReLU(negative_slope=0.01)
+            (sigmoid): Sigmoid()
+            (norm1): LayerNorm((52,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((52,), eps=1e-05, elementwise_affine=True)
+            (wqkv): Linear(in_features=52, out_features=156, bias=True)
+            (v_LePE): dwconv(
+              (depthwise_conv): Sequential(
+                (0): Conv2d(52, 52, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=52)
+                (1): GELU(approximate='none')
+              )
+            )
+            (attn_win): WindowAttention(
+              dim=52, window_size=(32, 32), num_heads=4, qkv_bias=True
+              (proj): Linear(in_features=52, out_features=52, bias=True)
+              (softmax): Softmax(dim=-1)
+            )
+            (convffn): ConvFFN(
+              (fc1): Linear(in_features=52, out_features=52, bias=True)
+              (act): GELU(approximate='none')
+              (dwconv): dwconv(
+                (depthwise_conv): Sequential(
+                  (0): Conv2d(52, 52, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=52)
+                  (1): GELU(approximate='none')
+                )
+              )
+              (fc2): Linear(in_features=52, out_features=52, bias=True)
+            )
+          )
+        )
+      )
+      (conv): Conv2d(52, 52, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+    (2-4): 3 x PFTB(
+      (patch_embed): PatchEmbed()
+      (patch_unembed): PatchUnEmbed()
+      (residual_group): BasicBlock(
+        dim=52, input_resolution=(64, 64), depth=6
+        (layers): ModuleList(
+          (0-5): 6 x PFTransformerLayer(
+            (softmax): Softmax(dim=-1)
+            (lrelu): LeakyReLU(negative_slope=0.01)
+            (sigmoid): Sigmoid()
+            (norm1): LayerNorm((52,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((52,), eps=1e-05, elementwise_affine=True)
+            (wqkv): Linear(in_features=52, out_features=156, bias=True)
+            (v_LePE): dwconv(
+              (depthwise_conv): Sequential(
+                (0): Conv2d(52, 52, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=52)
+                (1): GELU(approximate='none')
+              )
+            )
+            (attn_win): WindowAttention(
+              dim=52, window_size=(32, 32), num_heads=4, qkv_bias=True
+              (proj): Linear(in_features=52, out_features=52, bias=True)
+              (softmax): Softmax(dim=-1)
+            )
+            (convffn): ConvFFN(
+              (fc1): Linear(in_features=52, out_features=52, bias=True)
+              (act): GELU(approximate='none')
+              (dwconv): dwconv(
+                (depthwise_conv): Sequential(
+                  (0): Conv2d(52, 52, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=52)
+                  (1): GELU(approximate='none')
+                )
+              )
+              (fc2): Linear(in_features=52, out_features=52, bias=True)
+            )
+          )
+        )
+      )
+      (conv): Conv2d(52, 52, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (norm): LayerNorm((52,), eps=1e-05, elementwise_affine=True)
+  (conv_after_body): Conv2d(52, 52, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (upsample): UpsampleOneStep(
+    (0): Conv2d(52, 12, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): PixelShuffle(upscale_factor=2)
+  )
+)
+2025-09-09 11:45:26,854 INFO: Use Exponential Moving Average with decay: 0.999
+2025-09-09 11:45:26,898 INFO: Network [PFT] is created.
+2025-09-09 11:45:26,938 INFO: Loss [L1Loss] is created.
+2025-09-09 11:45:26,941 INFO: Model [PFTModel] is created.
+2025-09-09 11:45:27,119 INFO: Use cuda prefetch dataloader
+2025-09-09 11:45:27,119 INFO: Start training from epoch: 0, iter: 0
+2025-09-09 11:46:29,891 INFO: [PFT_l..][epoch:  0, iter:     100, lr:(1.000e-05,)] [eta: 2 days, 19:01:27, time (data): 0.628 (0.001)] l_pix: 1.0657e-01 
+2025-09-09 11:47:31,562 INFO: [PFT_l..][epoch:  0, iter:     200, lr:(2.000e-05,)] [eta: 2 days, 19:44:41, time (data): 0.622 (0.001)] l_pix: 8.3884e-02 
+2025-09-09 11:48:33,259 INFO: [PFT_l..][epoch:  1, iter:     300, lr:(3.000e-05,)] [eta: 2 days, 19:59:03, time (data): 0.617 (0.001)] l_pix: 3.6726e-02 
+2025-09-09 11:49:34,561 INFO: [PFT_l..][epoch:  1, iter:     400, lr:(4.000e-05,)] [eta: 2 days, 19:59:12, time (data): 0.615 (0.001)] l_pix: 4.6569e-02 
+2025-09-09 11:50:35,868 INFO: [PFT_l..][epoch:  2, iter:     500, lr:(5.000e-05,)] [eta: 2 days, 19:58:57, time (data): 0.613 (0.001)] l_pix: 3.9012e-02 
+2025-09-09 11:51:36,835 INFO: [PFT_l..][epoch:  2, iter:     600, lr:(6.000e-05,)] [eta: 2 days, 19:54:40, time (data): 0.611 (0.001)] l_pix: 2.2022e-02 
+2025-09-09 11:52:37,687 INFO: [PFT_l..][epoch:  2, iter:     700, lr:(7.000e-05,)] [eta: 2 days, 19:50:14, time (data): 0.608 (0.000)] l_pix: 2.5282e-02 
+2025-09-09 11:53:38,525 INFO: [PFT_l..][epoch:  3, iter:     800, lr:(8.000e-05,)] [eta: 2 days, 19:46:32, time (data): 0.608 (0.001)] l_pix: 2.2378e-02 
+2025-09-09 11:54:39,184 INFO: [PFT_l..][epoch:  3, iter:     900, lr:(9.000e-05,)] [eta: 2 days, 19:42:06, time (data): 0.607 (0.000)] l_pix: 2.0786e-02 
+2025-09-09 11:55:39,918 INFO: [PFT_l..][epoch:  4, iter:   1,000, lr:(1.000e-04,)] [eta: 2 days, 19:38:51, time (data): 0.607 (0.001)] l_pix: 3.0699e-02 
+2025-09-09 11:56:40,526 INFO: [PFT_l..][epoch:  4, iter:   1,100, lr:(1.100e-04,)] [eta: 2 days, 19:35:16, time (data): 0.606 (0.000)] l_pix: 2.2645e-02 
+2025-09-09 11:57:41,016 INFO: [PFT_l..][epoch:  4, iter:   1,200, lr:(1.200e-04,)] [eta: 2 days, 19:31:26, time (data): 0.605 (0.000)] l_pix: 2.3984e-02 
+2025-09-09 11:58:41,588 INFO: [PFT_l..][epoch:  5, iter:   1,300, lr:(1.300e-04,)] [eta: 2 days, 19:28:28, time (data): 0.606 (0.001)] l_pix: 2.4743e-02 
+2025-09-09 11:59:41,884 INFO: [PFT_l..][epoch:  5, iter:   1,400, lr:(1.400e-04,)] [eta: 2 days, 19:24:28, time (data): 0.604 (0.001)] l_pix: 2.5098e-02 
+2025-09-09 12:00:42,140 INFO: [PFT_l..][epoch:  6, iter:   1,500, lr:(1.500e-04,)] [eta: 2 days, 19:20:41, time (data): 0.603 (0.001)] l_pix: 2.0409e-02 
+2025-09-09 12:01:42,201 INFO: [PFT_l..][epoch:  6, iter:   1,600, lr:(1.600e-04,)] [eta: 2 days, 19:16:27, time (data): 0.602 (0.001)] l_pix: 2.3956e-02 
+2025-09-09 12:02:42,089 INFO: [PFT_l..][epoch:  6, iter:   1,700, lr:(1.700e-04,)] [eta: 2 days, 19:11:55, time (data): 0.599 (0.000)] l_pix: 1.9413e-02 
+2025-09-09 12:03:41,925 INFO: [PFT_l..][epoch:  7, iter:   1,800, lr:(1.800e-04,)] [eta: 2 days, 19:07:35, time (data): 0.599 (0.001)] l_pix: 2.0543e-02 
+2025-09-09 12:04:41,727 INFO: [PFT_l..][epoch:  7, iter:   1,900, lr:(1.900e-04,)] [eta: 2 days, 19:03:29, time (data): 0.598 (0.000)] l_pix: 1.4772e-02 
+2025-09-09 12:05:41,306 INFO: [PFT_l..][epoch:  8, iter:   2,000, lr:(1.999e-04,)] [eta: 2 days, 18:58:57, time (data): 0.597 (0.001)] l_pix: 2.6772e-02 
+2025-09-09 12:06:40,674 INFO: [PFT_l..][epoch:  8, iter:   2,100, lr:(1.999e-04,)] [eta: 2 days, 18:54:06, time (data): 0.594 (0.000)] l_pix: 2.2840e-02 
+2025-09-09 12:07:40,016 INFO: [PFT_l..][epoch:  9, iter:   2,200, lr:(1.999e-04,)] [eta: 2 days, 18:49:31, time (data): 0.593 (0.001)] l_pix: 1.4673e-02 
+2025-09-09 12:08:39,132 INFO: [PFT_l..][epoch:  9, iter:   2,300, lr:(1.999e-04,)] [eta: 2 days, 18:44:35, time (data): 0.591 (0.000)] l_pix: 2.0671e-02 
+2025-09-09 12:09:38,209 INFO: [PFT_l..][epoch:  9, iter:   2,400, lr:(1.999e-04,)] [eta: 2 days, 18:39:53, time (data): 0.591 (0.000)] l_pix: 1.6127e-02 
+2025-09-09 12:10:37,650 INFO: [PFT_l..][epoch: 10, iter:   2,500, lr:(1.999e-04,)] [eta: 2 days, 18:36:26, time (data): 0.595 (0.001)] l_pix: 1.7677e-02 
+2025-09-09 12:11:36,974 INFO: [PFT_l..][epoch: 10, iter:   2,600, lr:(1.999e-04,)] [eta: 2 days, 18:32:53, time (data): 0.594 (0.001)] l_pix: 2.3129e-02 
+2025-09-09 12:12:36,353 INFO: [PFT_l..][epoch: 11, iter:   2,700, lr:(1.999e-04,)] [eta: 2 days, 18:29:39, time (data): 0.594 (0.001)] l_pix: 1.4890e-02 
+2025-09-09 12:13:35,651 INFO: [PFT_l..][epoch: 11, iter:   2,800, lr:(1.999e-04,)] [eta: 2 days, 18:26:24, time (data): 0.593 (0.001)] l_pix: 1.1973e-02 
+2025-09-09 12:14:34,833 INFO: [PFT_l..][epoch: 11, iter:   2,900, lr:(1.999e-04,)] [eta: 2 days, 18:23:02, time (data): 0.592 (0.000)] l_pix: 1.5316e-02 
+2025-09-09 12:15:33,497 INFO: [PFT_l..][epoch: 12, iter:   3,000, lr:(1.999e-04,)] [eta: 2 days, 18:18:41, time (data): 0.589 (0.001)] l_pix: 1.4101e-02 
+2025-09-09 12:16:31,870 INFO: [PFT_l..][epoch: 12, iter:   3,100, lr:(1.999e-04,)] [eta: 2 days, 18:13:56, time (data): 0.583 (0.000)] l_pix: 2.4641e-02 
+2025-09-09 12:17:30,450 INFO: [PFT_l..][epoch: 13, iter:   3,200, lr:(1.999e-04,)] [eta: 2 days, 18:09:50, time (data): 0.585 (0.001)] l_pix: 2.0575e-02 
+2025-09-09 12:18:28,900 INFO: [PFT_l..][epoch: 13, iter:   3,300, lr:(1.999e-04,)] [eta: 2 days, 18:05:41, time (data): 0.584 (0.000)] l_pix: 2.5633e-02 
+2025-09-09 12:19:26,999 INFO: [PFT_l..][epoch: 13, iter:   3,400, lr:(1.999e-04,)] [eta: 2 days, 18:01:01, time (data): 0.582 (0.000)] l_pix: 1.8271e-02 
+2025-09-09 12:20:25,163 INFO: [PFT_l..][epoch: 14, iter:   3,500, lr:(1.999e-04,)] [eta: 2 days, 17:56:42, time (data): 0.580 (0.000)] l_pix: 1.8538e-02 
+2025-09-09 12:21:23,314 INFO: [PFT_l..][epoch: 14, iter:   3,600, lr:(1.999e-04,)] [eta: 2 days, 17:52:32, time (data): 0.581 (0.000)] l_pix: 2.1947e-02 
+2025-09-09 12:22:21,466 INFO: [PFT_l..][epoch: 15, iter:   3,700, lr:(1.999e-04,)] [eta: 2 days, 17:48:33, time (data): 0.582 (0.001)] l_pix: 2.1216e-02 
+2025-09-09 12:23:19,506 INFO: [PFT_l..][epoch: 15, iter:   3,800, lr:(1.999e-04,)] [eta: 2 days, 17:44:32, time (data): 0.581 (0.001)] l_pix: 2.9397e-02 
+2025-09-09 12:24:17,142 INFO: [PFT_l..][epoch: 15, iter:   3,900, lr:(1.999e-04,)] [eta: 2 days, 17:39:59, time (data): 0.576 (0.000)] l_pix: 2.2615e-02 
+2025-09-09 12:25:14,866 INFO: [PFT_l..][epoch: 16, iter:   4,000, lr:(1.999e-04,)] [eta: 2 days, 17:35:46, time (data): 0.577 (0.001)] l_pix: 1.9380e-02 
+2025-09-09 12:26:12,420 INFO: [PFT_l..][epoch: 16, iter:   4,100, lr:(1.999e-04,)] [eta: 2 days, 17:31:25, time (data): 0.575 (0.000)] l_pix: 1.1300e-02 
+2025-09-09 12:27:10,524 INFO: [PFT_l..][epoch: 17, iter:   4,200, lr:(1.999e-04,)] [eta: 2 days, 17:28:06, time (data): 0.578 (0.001)] l_pix: 2.2423e-02 
+2025-09-09 12:28:08,927 INFO: [PFT_l..][epoch: 17, iter:   4,300, lr:(1.999e-04,)] [eta: 2 days, 17:25:22, time (data): 0.583 (0.000)] l_pix: 1.8419e-02 
+2025-09-09 12:29:07,400 INFO: [PFT_l..][epoch: 18, iter:   4,400, lr:(1.999e-04,)] [eta: 2 days, 17:22:48, time (data): 0.584 (0.001)] l_pix: 1.3980e-02 
+2025-09-09 12:30:05,770 INFO: [PFT_l..][epoch: 18, iter:   4,500, lr:(1.999e-04,)] [eta: 2 days, 17:20:09, time (data): 0.584 (0.000)] l_pix: 9.7730e-03 
+2025-09-09 12:31:04,224 INFO: [PFT_l..][epoch: 18, iter:   4,600, lr:(1.999e-04,)] [eta: 2 days, 17:17:42, time (data): 0.584 (0.000)] l_pix: 2.4902e-02 
+2025-09-09 12:32:02,274 INFO: [PFT_l..][epoch: 19, iter:   4,700, lr:(1.999e-04,)] [eta: 2 days, 17:14:45, time (data): 0.579 (0.001)] l_pix: 1.6239e-02 
+2025-09-09 12:32:59,979 INFO: [PFT_l..][epoch: 19, iter:   4,800, lr:(1.999e-04,)] [eta: 2 days, 17:11:25, time (data): 0.578 (0.001)] l_pix: 2.8476e-02 
+2025-09-09 12:33:57,988 INFO: [PFT_l..][epoch: 20, iter:   4,900, lr:(1.999e-04,)] [eta: 2 days, 17:08:34, time (data): 0.581 (0.001)] l_pix: 1.5393e-02 
+2025-09-09 12:34:55,791 INFO: [PFT_l..][epoch: 20, iter:   5,000, lr:(1.999e-04,)] [eta: 2 days, 17:05:32, time (data): 0.579 (0.001)] l_pix: 1.5439e-02 
+2025-09-09 12:35:53,719 INFO: [PFT_l..][epoch: 20, iter:   5,100, lr:(1.999e-04,)] [eta: 2 days, 17:02:45, time (data): 0.580 (0.000)] l_pix: 1.2159e-02 
+2025-09-09 12:36:51,904 INFO: [PFT_l..][epoch: 21, iter:   5,200, lr:(1.999e-04,)] [eta: 2 days, 17:00:21, time (data): 0.581 (0.001)] l_pix: 9.3431e-03 
+2025-09-09 12:37:49,710 INFO: [PFT_l..][epoch: 21, iter:   5,300, lr:(1.999e-04,)] [eta: 2 days, 16:57:33, time (data): 0.578 (0.000)] l_pix: 2.1409e-02 
+2025-09-09 12:38:47,616 INFO: [PFT_l..][epoch: 22, iter:   5,400, lr:(1.999e-04,)] [eta: 2 days, 16:54:55, time (data): 0.579 (0.001)] l_pix: 2.0885e-02 
+2025-09-09 12:39:45,475 INFO: [PFT_l..][epoch: 22, iter:   5,500, lr:(1.999e-04,)] [eta: 2 days, 16:52:18, time (data): 0.578 (0.000)] l_pix: 1.3707e-02 
+2025-09-09 12:40:43,294 INFO: [PFT_l..][epoch: 22, iter:   5,600, lr:(1.999e-04,)] [eta: 2 days, 16:49:42, time (data): 0.578 (0.000)] l_pix: 2.1218e-02 
+2025-09-09 12:41:41,198 INFO: [PFT_l..][epoch: 23, iter:   5,700, lr:(1.999e-04,)] [eta: 2 days, 16:47:15, time (data): 0.578 (0.000)] l_pix: 9.5913e-03 
+2025-09-09 12:42:39,052 INFO: [PFT_l..][epoch: 23, iter:   5,800, lr:(1.999e-04,)] [eta: 2 days, 16:44:47, time (data): 0.578 (0.000)] l_pix: 1.7760e-02 
+2025-09-09 12:43:36,956 INFO: [PFT_l..][epoch: 24, iter:   5,900, lr:(1.999e-04,)] [eta: 2 days, 16:42:26, time (data): 0.579 (0.001)] l_pix: 2.4608e-02 
+2025-09-09 12:44:34,780 INFO: [PFT_l..][epoch: 24, iter:   6,000, lr:(1.999e-04,)] [eta: 2 days, 16:40:03, time (data): 0.579 (0.001)] l_pix: 1.3332e-02 
+2025-09-09 12:45:32,584 INFO: [PFT_l..][epoch: 24, iter:   6,100, lr:(1.999e-04,)] [eta: 2 days, 16:37:41, time (data): 0.578 (0.000)] l_pix: 1.3161e-02 
+2025-09-09 12:46:30,502 INFO: [PFT_l..][epoch: 25, iter:   6,200, lr:(1.999e-04,)] [eta: 2 days, 16:35:29, time (data): 0.579 (0.001)] l_pix: 1.7107e-02 
+2025-09-09 12:47:28,335 INFO: [PFT_l..][epoch: 25, iter:   6,300, lr:(1.999e-04,)] [eta: 2 days, 16:33:14, time (data): 0.578 (0.000)] l_pix: 1.5830e-02 
+2025-09-09 12:48:26,232 INFO: [PFT_l..][epoch: 26, iter:   6,400, lr:(1.999e-04,)] [eta: 2 days, 16:31:05, time (data): 0.579 (0.001)] l_pix: 1.2038e-02 
+2025-09-09 12:49:24,079 INFO: [PFT_l..][epoch: 26, iter:   6,500, lr:(1.999e-04,)] [eta: 2 days, 16:28:56, time (data): 0.578 (0.000)] l_pix: 1.6077e-02 
+2025-09-09 12:50:21,957 INFO: [PFT_l..][epoch: 27, iter:   6,600, lr:(1.999e-04,)] [eta: 2 days, 16:26:51, time (data): 0.579 (0.001)] l_pix: 1.8000e-02 
+2025-09-09 12:51:19,771 INFO: [PFT_l..][epoch: 27, iter:   6,700, lr:(1.999e-04,)] [eta: 2 days, 16:24:43, time (data): 0.578 (0.000)] l_pix: 9.5903e-03 
+2025-09-09 12:52:17,647 INFO: [PFT_l..][epoch: 27, iter:   6,800, lr:(1.999e-04,)] [eta: 2 days, 16:22:42, time (data): 0.578 (0.000)] l_pix: 1.3958e-02 
+2025-09-09 12:53:15,578 INFO: [PFT_l..][epoch: 28, iter:   6,900, lr:(1.999e-04,)] [eta: 2 days, 16:20:45, time (data): 0.579 (0.000)] l_pix: 1.7344e-02 
+2025-09-09 12:54:13,441 INFO: [PFT_l..][epoch: 28, iter:   7,000, lr:(1.999e-04,)] [eta: 2 days, 16:18:47, time (data): 0.579 (0.000)] l_pix: 1.5204e-02 
+2025-09-09 12:55:11,377 INFO: [PFT_l..][epoch: 29, iter:   7,100, lr:(1.999e-04,)] [eta: 2 days, 16:16:54, time (data): 0.580 (0.002)] l_pix: 1.5342e-02 
+2025-09-09 12:56:09,229 INFO: [PFT_l..][epoch: 29, iter:   7,200, lr:(1.999e-04,)] [eta: 2 days, 16:14:58, time (data): 0.579 (0.001)] l_pix: 1.9083e-02 
+2025-09-09 12:57:07,043 INFO: [PFT_l..][epoch: 29, iter:   7,300, lr:(1.999e-04,)] [eta: 2 days, 16:13:01, time (data): 0.578 (0.000)] l_pix: 1.3910e-02 
+2025-09-09 12:58:04,941 INFO: [PFT_l..][epoch: 30, iter:   7,400, lr:(1.999e-04,)] [eta: 2 days, 16:11:11, time (data): 0.579 (0.001)] l_pix: 1.2293e-02 
+2025-09-09 12:59:02,763 INFO: [PFT_l..][epoch: 30, iter:   7,500, lr:(1.999e-04,)] [eta: 2 days, 16:09:18, time (data): 0.579 (0.000)] l_pix: 1.2373e-02 
+2025-09-09 13:00:20,746 INFO: [PFT_l..][epoch: 31, iter:   7,600, lr:(1.999e-04,)] [eta: 2 days, 16:24:47, time (data): 0.702 (0.001)] l_pix: 9.2907e-03 
+2025-09-09 13:01:53,166 INFO: [PFT_l..][epoch: 31, iter:   7,700, lr:(1.999e-04,)] [eta: 2 days, 16:52:05, time (data): 0.925 (0.001)] l_pix: 1.6366e-02 
+2025-09-09 13:03:25,931 INFO: [PFT_l..][epoch: 31, iter:   7,800, lr:(1.999e-04,)] [eta: 2 days, 17:18:57, time (data): 0.927 (0.001)] l_pix: 1.7264e-02 
+2025-09-09 13:04:52,638 INFO: [PFT_l..][epoch: 32, iter:   7,900, lr:(1.999e-04,)] [eta: 2 days, 17:40:05, time (data): 0.829 (0.001)] l_pix: 1.8754e-02 
+2025-09-09 13:06:48,340 INFO: [PFT_l..][epoch: 32, iter:   8,000, lr:(1.999e-04,)] [eta: 2 days, 18:24:19, time (data): 1.033 (0.001)] l_pix: 2.0015e-02 
+2025-09-09 13:09:05,938 INFO: [PFT_l..][epoch: 33, iter:   8,100, lr:(1.999e-04,)] [eta: 2 days, 19:25:04, time (data): 1.370 (0.002)] l_pix: 2.1848e-02 
+2025-09-09 13:11:26,701 INFO: [PFT_l..][epoch: 33, iter:   8,200, lr:(1.999e-04,)] [eta: 2 days, 20:26:49, time (data): 1.393 (0.001)] l_pix: 1.2619e-02 
+2025-09-09 13:13:46,931 INFO: [PFT_l..][epoch: 34, iter:   8,300, lr:(1.999e-04,)] [eta: 2 days, 21:26:35, time (data): 1.394 (0.002)] l_pix: 1.1256e-02 
+2025-09-09 13:16:05,286 INFO: [PFT_l..][epoch: 34, iter:   8,400, lr:(1.999e-04,)] [eta: 2 days, 22:23:25, time (data): 1.387 (0.001)] l_pix: 1.2970e-02 
+2025-09-09 13:18:06,324 INFO: [PFT_l..][epoch: 34, iter:   8,500, lr:(1.999e-04,)] [eta: 2 days, 23:05:35, time (data): 1.107 (0.001)] l_pix: 1.2274e-02 

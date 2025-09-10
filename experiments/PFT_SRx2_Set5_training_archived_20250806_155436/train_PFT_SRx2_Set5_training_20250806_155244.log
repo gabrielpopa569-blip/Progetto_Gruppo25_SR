@@ -1,0 +1,178 @@
+2025-08-06 15:52:44,177 INFO: 
+                ____                _       _____  ____
+               / __ ) ____ _ _____ (_)_____/ ___/ / __ \
+              / __  |/ __ `// ___// // ___/\__ \ / /_/ /
+             / /_/ // /_/ /(__  )/ // /__ ___/ // _, _/
+            /_____/ \__,_//____//_/ \___//____//_/ |_|
+     ______                   __   __                 __      __
+    / ____/____   ____   ____/ /  / /   __  __ _____ / /__   / /
+   / / __ / __ \ / __ \ / __  /  / /   / / / // ___// //_/  / /
+  / /_/ // /_/ // /_/ // /_/ /  / /___/ /_/ // /__ / /<    /_/
+  \____/ \____/ \____/ \____/  /_____/\____/ \___//_/|_|  (_)
+    
+Version Information: 
+	BasicSR: 0.1.1
+	PyTorch: 2.7.1+cu126
+	TorchVision: 0.22.1+cu126
+2025-08-06 15:52:44,177 INFO: 
+  name: PFT_SRx2_Set5_training
+  model_type: PFTModel
+  scale: 2
+  num_gpu: 1
+  manual_seed: 0
+  find_unused_parameters: True
+  datasets:[
+    train:[
+      name: Set5
+      type: PairedImageDataset
+      dataroot_gt: datasets/TestDataSR/HR/Set5/x2
+      dataroot_lq: datasets/TestDataSR/LR/LRBI/Set5/x2
+      filename_tmpl: {}x2
+      io_backend:[
+        type: disk
+      ]
+      gt_size: 128
+      use_hflip: True
+      use_rot: True
+      num_worker_per_gpu: 8
+      batch_size_per_gpu: 4
+      dataset_enlarge_ratio: 1
+      prefetch_mode: cuda
+      pin_memory: True
+      persistent_workers: True
+      phase: train
+      scale: 2
+    ]
+    val_1:[
+      name: Set5
+      type: PairedImageDataset
+      dataroot_gt: datasets/TestDataSR/HR/Set5/x2
+      dataroot_lq: datasets/TestDataSR/LR/LRBI/Set5/x2
+      io_backend:[
+        type: disk
+      ]
+      phase: val
+      scale: 2
+    ]
+    val_2:[
+      name: Set14
+      type: PairedImageDataset
+      dataroot_gt: datasets/TestDataSR/HR/Set14/x2
+      dataroot_lq: datasets/TestDataSR/LR/LRBI/Set14/x2
+      io_backend:[
+        type: disk
+      ]
+      phase: val
+      scale: 2
+    ]
+    val_3:[
+      name: BSD100
+      type: PairedImageDataset
+      dataroot_gt: datasets/TestDataSR/HR/B100/x2
+      dataroot_lq: datasets/TestDataSR/LR/LRBI/B100/x2
+      io_backend:[
+        type: disk
+      ]
+      phase: val
+      scale: 2
+    ]
+  ]
+  network_g:[
+    type: PFT
+    upscale: 2
+    in_chans: 3
+    img_size: 64
+    embed_dim: 240
+    depths: [4, 4, 4, 6, 6, 6]
+    num_heads: 6
+    num_topk: [1024, 1024, 1024, 1024, 256, 256, 256, 256, 128, 128, 128, 128, 64, 64, 64, 64, 64, 64, 32, 32, 32, 32, 32, 32, 16, 16, 16, 16, 16, 16]
+    window_size: 32
+    convffn_kernel_size: 7
+    img_range: 1.0
+    mlp_ratio: 2.0
+    upsampler: pixelshuffle
+    resi_connection: 1conv
+    use_checkpoint: False
+  ]
+  path:[
+    pretrain_network_g: None
+    strict_load_g: True
+    resume_state: None
+    experiments_root: /app/PFT-SR/experiments/PFT_SRx2_Set5_training
+    models: /app/PFT-SR/experiments/PFT_SRx2_Set5_training/models
+    training_states: /app/PFT-SR/experiments/PFT_SRx2_Set5_training/training_states
+    log: /app/PFT-SR/experiments/PFT_SRx2_Set5_training
+    visualization: /app/PFT-SR/experiments/PFT_SRx2_Set5_training/visualization
+  ]
+  train:[
+    ema_decay: 0.999
+    optim_g:[
+      type: AdamW
+      lr: 0.0002
+      weight_decay: 0
+      betas: [0.9, 0.99]
+    ]
+    scheduler:[
+      type: MultiStepLR
+      milestones: [2500, 4000, 4500, 4750, 4900]
+      gamma: 0.5
+    ]
+    total_iter: 5000
+    warmup_iter: 200
+    pixel_opt:[
+      type: L1Loss
+      loss_weight: 1.0
+      reduction: mean
+    ]
+  ]
+  val:[
+    val_freq: 10000.0
+    save_img: False
+    metrics:[
+      psnr:[
+        type: calculate_psnr
+        crop_border: 2
+        test_y_channel: True
+      ]
+      ssim:[
+        type: calculate_ssim
+        crop_border: 2
+        test_y_channel: True
+      ]
+    ]
+  ]
+  logger:[
+    print_freq: 100
+    save_checkpoint_freq: 10000.0
+    use_tb_logger: True
+    wandb:[
+      project: None
+      resume_id: None
+    ]
+  ]
+  dist_params:[
+    backend: nccl
+    port: 29500
+  ]
+  dist: True
+  rank: 0
+  world_size: 8
+  auto_resume: False
+  is_train: True
+  root_path: /app/PFT-SR
+
+2025-08-06 15:52:44,242 INFO: Dataset [PairedImageDataset] - Set5 is built.
+2025-08-06 15:52:44,242 INFO: Training statistics:
+	Number of train images: 5
+	Dataset enlarge ratio: 1
+	Batch size per gpu: 4
+	World size (gpu number): 8
+	Require iter number per epoch: 1
+	Total epochs: 5000; iters: 5000.
+2025-08-06 15:52:44,243 INFO: Dataset [PairedImageDataset] - Set5 is built.
+2025-08-06 15:52:44,243 INFO: Number of val images/folders in Set5: 5
+2025-08-06 15:52:44,243 INFO: Dataset [PairedImageDataset] - Set14 is built.
+2025-08-06 15:52:44,244 INFO: Number of val images/folders in Set14: 14
+2025-08-06 15:52:44,248 INFO: Dataset [PairedImageDataset] - BSD100 is built.
+2025-08-06 15:52:44,248 INFO: Number of val images/folders in BSD100: 100
+2025-08-06 15:52:44,539 INFO: Network [PFT] is created.

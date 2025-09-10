@@ -1,0 +1,247 @@
+2025-08-10 15:23:30,084 INFO: 
+                ____                _       _____  ____
+               / __ ) ____ _ _____ (_)_____/ ___/ / __ \
+              / __  |/ __ `// ___// // ___/\__ \ / /_/ /
+             / /_/ // /_/ /(__  )/ // /__ ___/ // _, _/
+            /_____/ \__,_//____//_/ \___//____//_/ |_|
+     ______                   __   __                 __      __
+    / ____/____   ____   ____/ /  / /   __  __ _____ / /__   / /
+   / / __ / __ \ / __ \ / __  /  / /   / / / // ___// //_/  / /
+  / /_/ // /_/ // /_/ // /_/ /  / /___/ /_/ // /__ / /<    /_/
+  \____/ \____/ \____/ \____/  /_____/\____/ \___//_/|_|  (_)
+    
+Version Information: 
+	BasicSR: 0.1.1
+	PyTorch: 2.7.1+cu126
+	TorchVision: 0.22.1+cu126
+2025-08-10 15:23:30,084 INFO: 
+  name: PFT_SRx2_Set5_test
+  model_type: PFTModel
+  scale: 2
+  num_gpu: 1
+  manual_seed: 0
+  datasets:[
+    test_1:[
+      name: Set5
+      type: PairedImageDataset
+      dataroot_gt: datasets/TestDataSR/HR/Set5/x2
+      dataroot_lq: datasets/TestDataSR/LR/LRBI/Set5/x2
+      io_backend:[
+        type: disk
+      ]
+      phase: test
+      scale: 2
+    ]
+    test_2:[
+      name: Set14
+      type: PairedImageDataset
+      dataroot_gt: datasets/TestDataSR/HR/Set14/x2
+      dataroot_lq: datasets/TestDataSR/LR/LRBI/Set14/x2
+      io_backend:[
+        type: disk
+      ]
+      phase: test
+      scale: 2
+    ]
+    test_3:[
+      name: BSD100
+      type: PairedImageDataset
+      dataroot_gt: datasets/TestDataSR/HR/B100/x2
+      dataroot_lq: datasets/TestDataSR/LR/LRBI/B100/x2
+      io_backend:[
+        type: disk
+      ]
+      phase: test
+      scale: 2
+    ]
+    test_4:[
+      name: Urban100
+      type: PairedImageDataset
+      dataroot_gt: datasets/TestDataSR/HR/Urban100/x2
+      dataroot_lq: datasets/TestDataSR/LR/LRBI/Urban100/x2
+      io_backend:[
+        type: disk
+      ]
+      phase: test
+      scale: 2
+    ]
+  ]
+  network_g:[
+    type: PFT
+    upscale: 2
+    in_chans: 3
+    img_size: 64
+    embed_dim: 240
+    depths: [4, 4, 4, 6, 6, 6]
+    num_heads: 6
+    num_topk: [1024, 1024, 1024, 1024, 256, 256, 256, 256, 128, 128, 128, 128, 64, 64, 64, 64, 64, 64, 32, 32, 32, 32, 32, 32, 16, 16, 16, 16, 16, 16]
+    window_size: 32
+    convffn_kernel_size: 7
+    img_range: 1.0
+    mlp_ratio: 2.0
+    upsampler: pixelshuffle
+    resi_connection: 1conv
+    use_checkpoint: False
+  ]
+  path:[
+    pretrain_network_g: experiments/PFT_SRx2_Set5_training/models/net_g_30000.pth
+    strict_load_g: True
+    param_key_g: params_ema
+    results_root: /app/PFT-SR/results/PFT_SRx2_Set5_test
+    log: /app/PFT-SR/results/PFT_SRx2_Set5_test
+    visualization: /app/PFT-SR/results/PFT_SRx2_Set5_test/visualization
+  ]
+  val:[
+    save_img: True
+    suffix: None
+    metrics:[
+      psnr:[
+        type: calculate_psnr
+        crop_border: 2
+        test_y_channel: True
+      ]
+      ssim:[
+        type: calculate_ssim
+        crop_border: 2
+        test_y_channel: True
+      ]
+    ]
+  ]
+  dist: False
+  rank: 0
+  world_size: 1
+  auto_resume: False
+  is_train: False
+
+2025-08-10 15:23:30,085 INFO: Dataset [PairedImageDataset] - Set5 is built.
+2025-08-10 15:23:30,085 INFO: Number of test images in Set5: 5
+2025-08-10 15:23:30,086 INFO: Dataset [PairedImageDataset] - Set14 is built.
+2025-08-10 15:23:30,086 INFO: Number of test images in Set14: 14
+2025-08-10 15:23:30,090 INFO: Dataset [PairedImageDataset] - BSD100 is built.
+2025-08-10 15:23:30,090 INFO: Number of test images in BSD100: 100
+2025-08-10 15:23:30,094 INFO: Dataset [PairedImageDataset] - Urban100 is built.
+2025-08-10 15:23:30,094 INFO: Number of test images in Urban100: 100
+2025-08-10 15:23:30,423 INFO: Network [PFT] is created.
+2025-08-10 15:23:30,610 INFO: Network: PFT, with parameters: 19,623,527
+2025-08-10 15:23:30,610 INFO: PFT(
+  (conv_first): Conv2d(3, 240, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (patch_embed): PatchEmbed(
+    (norm): LayerNorm((240,), eps=1e-05, elementwise_affine=True)
+  )
+  (patch_unembed): PatchUnEmbed()
+  (layers): ModuleList(
+    (0-2): 3 x PFTB(
+      (patch_embed): PatchEmbed()
+      (patch_unembed): PatchUnEmbed()
+      (residual_group): BasicBlock(
+        dim=240, input_resolution=(64, 64), depth=4
+        (layers): ModuleList(
+          (0-3): 4 x PFTransformerLayer(
+            (softmax): Softmax(dim=-1)
+            (lrelu): LeakyReLU(negative_slope=0.01)
+            (sigmoid): Sigmoid()
+            (norm1): LayerNorm((240,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((240,), eps=1e-05, elementwise_affine=True)
+            (wqkv): Linear(in_features=240, out_features=720, bias=True)
+            (v_LePE): dwconv(
+              (depthwise_conv): Sequential(
+                (0): Conv2d(240, 240, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=240)
+                (1): GELU(approximate='none')
+              )
+            )
+            (attn_win): WindowAttention(
+              dim=240, window_size=(32, 32), num_heads=6, qkv_bias=True
+              (proj): Linear(in_features=240, out_features=240, bias=True)
+              (softmax): Softmax(dim=-1)
+            )
+            (convffn): ConvFFN(
+              (fc1): Linear(in_features=240, out_features=480, bias=True)
+              (act): GELU(approximate='none')
+              (dwconv): dwconv(
+                (depthwise_conv): Sequential(
+                  (0): Conv2d(480, 480, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=480)
+                  (1): GELU(approximate='none')
+                )
+              )
+              (fc2): Linear(in_features=480, out_features=240, bias=True)
+            )
+          )
+        )
+      )
+      (conv): Conv2d(240, 240, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+    (3-5): 3 x PFTB(
+      (patch_embed): PatchEmbed()
+      (patch_unembed): PatchUnEmbed()
+      (residual_group): BasicBlock(
+        dim=240, input_resolution=(64, 64), depth=6
+        (layers): ModuleList(
+          (0-5): 6 x PFTransformerLayer(
+            (softmax): Softmax(dim=-1)
+            (lrelu): LeakyReLU(negative_slope=0.01)
+            (sigmoid): Sigmoid()
+            (norm1): LayerNorm((240,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((240,), eps=1e-05, elementwise_affine=True)
+            (wqkv): Linear(in_features=240, out_features=720, bias=True)
+            (v_LePE): dwconv(
+              (depthwise_conv): Sequential(
+                (0): Conv2d(240, 240, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=240)
+                (1): GELU(approximate='none')
+              )
+            )
+            (attn_win): WindowAttention(
+              dim=240, window_size=(32, 32), num_heads=6, qkv_bias=True
+              (proj): Linear(in_features=240, out_features=240, bias=True)
+              (softmax): Softmax(dim=-1)
+            )
+            (convffn): ConvFFN(
+              (fc1): Linear(in_features=240, out_features=480, bias=True)
+              (act): GELU(approximate='none')
+              (dwconv): dwconv(
+                (depthwise_conv): Sequential(
+                  (0): Conv2d(480, 480, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=480)
+                  (1): GELU(approximate='none')
+                )
+              )
+              (fc2): Linear(in_features=480, out_features=240, bias=True)
+            )
+          )
+        )
+      )
+      (conv): Conv2d(240, 240, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (norm): LayerNorm((240,), eps=1e-05, elementwise_affine=True)
+  (conv_after_body): Conv2d(240, 240, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (conv_before_upsample): Sequential(
+    (0): Conv2d(240, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): LeakyReLU(negative_slope=0.01, inplace=True)
+  )
+  (upsample): Upsample(
+    (0): Conv2d(64, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): PixelShuffle(upscale_factor=2)
+  )
+  (conv_last): Conv2d(64, 3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+)
+2025-08-10 15:23:30,864 INFO: Loading PFT model from experiments/PFT_SRx2_Set5_training/models/net_g_30000.pth, with param key: [params_ema].
+2025-08-10 15:23:30,953 INFO: Model [PFTModel] is created.
+2025-08-10 15:23:30,953 INFO: Testing Set5...
+2025-08-10 15:23:36,180 INFO: Validation Set5
+	 # psnr: 44.4912	Best: 44.4912 @ PFT_SRx2_Set5_test iter
+	 # ssim: 0.9891	Best: 0.9891 @ PFT_SRx2_Set5_test iter
+
+2025-08-10 15:23:36,180 INFO: Testing Set14...
+2025-08-10 15:24:02,324 INFO: Validation Set14
+	 # psnr: 32.6438	Best: 32.6438 @ PFT_SRx2_Set5_test iter
+	 # ssim: 0.9035	Best: 0.9035 @ PFT_SRx2_Set5_test iter
+
+2025-08-10 15:24:02,324 INFO: Testing BSD100...
+2025-08-10 15:25:43,233 INFO: Validation BSD100
+	 # psnr: 30.9567	Best: 30.9567 @ PFT_SRx2_Set5_test iter
+	 # ssim: 0.8783	Best: 0.8783 @ PFT_SRx2_Set5_test iter
+
+2025-08-10 15:25:43,234 INFO: Testing Urban100...
+2025-08-10 15:35:35,431 INFO: Validation Urban100
+	 # psnr: 29.3162	Best: 29.3162 @ PFT_SRx2_Set5_test iter
+	 # ssim: 0.8902	Best: 0.8902 @ PFT_SRx2_Set5_test iter
+
