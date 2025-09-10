@@ -1,11 +1,12 @@
 **Progetto relativo al corso di Computer Vision & Deepl Learnin, a.a. 2024/2025**
-Docente Dott.ssa **Migliorelli Lucia**
+
+Docente Dott.ssa **Migliorelli Lucia**,
 Tutor Dott. **Galdelli Alessandro**
 
 
 **Studenti**:
-Popa V. Gabriel
-Perugini Andrea
+Popa V. Gabriel,
+Perugini Andrea,
 Tassoni Niccolò
 
 
