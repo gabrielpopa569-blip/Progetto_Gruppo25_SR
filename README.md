@@ -1,12 +1,12 @@
-**Progetto relativo al corso di Computer Vision & Deepl Learnin, a.a. 2024/2025
-Docente Dott.ssa Migliorelli Lucia
-Tutor Dott. Galdelli Alessandro
+**Progetto relativo al corso di Computer Vision & Deepl Learnin, a.a. 2024/2025**
+Docente Dott.ssa **Migliorelli Lucia**
+Tutor Dott. **Galdelli Alessandro**
 
 
-Studenti:
+**Studenti**:
 Popa V. Gabriel
 Perugini Andrea
-Tassoni Niccolò**
+Tassoni Niccolò
 
 
 Guida ai train e test per ottenere i risultati conseguiti nel progetto.
