@@ -20,12 +20,19 @@ dove al posto di NOME_FILE.yml si deve inserire il nome del file di training des
 
 In particolare, se si desidera effettuare i training sviluppati nel progetti si deve inserire:
 
+
 Train PFT light sul Set5 --> PFT_light_SRx2_Set5_primotraining.yml 
+
 Train PFT sul Set5 --> PFT_SRx2_Set5_training.yml
+
 Train PFT light sul Monash con loss classica --> PFT_light_SRx2_Monash.yml
+
 Train PFT light sul Monash con loss bilanciato --> PFT_light_SRx2_Monash_bilanciato.yml
+
 Train PFT light sul Monash con loss realismo --> PFT_light_SRx2_Monash_realismo.yml
+
 Train PFT-M sul Monash con loss classica --> PFT_M_SRx2.yml
+
 Train PFT-M sul DIV2K (da scaricare a parte) con loss bilanciato --> PFT_M_SRx2_bilanciato.yml
 
 Se si desidera modificare la tipologia di loss, all'interno di ciascun file yml si deve scorrere fino ad incontrare 'pixel_opt' ed inserire:
@@ -47,7 +54,7 @@ Se si desidera modificare la tipologia di loss, all'interno di ciascun file yml 
 
 I risultati di tali training saranno salvati automaticamente all'interno della cartella /experiments. Dentro il rispettivo taining effetutato si trova una cartella denominata /models dove si possono trovare i modelli salvati ogni 10k iterazioni. 
 
-**Per effettuare i test sui train effetuati è necessario copiare il path del modello (che si trova all'interno di experiments/models) ed inserirlo nel file di test .yml desiderato, alla voce 'pretrain_network_g'.**
+*Per effettuare i test sui train effetuati è necessario copiare il path del modello (che si trova all'interno di experiments/models) ed inserirlo nel file di test .yml desiderato, alla voce 'pretrain_network_g'.*
 
 -----------------------------------------------------------------------------------
 Per effettuare i **testing** è necessario inserire nel terminale il seguente codice:
@@ -57,12 +64,19 @@ dove al posto di NOME_FILE.yml si deve inserire il nome del file di testing desi
 
 In particolare, se si desidera effettuare i testing sviluppati nel progetti si deve inserire:
 
+
 Test PFT light sul Set5 --> PFT_light_SRx2_Set5_primotraining.yml
+
 Test PFT sul Set5 --> PFT_SRx2_Set5_test.yml
+
 Test PFT light sul Monash con loss classica --> PFT_light_SRx2_monashT.yml
+
 Test PFT light sul Monash con loss bilanciato --> PFT_light_SRx2_monashT.yml
+
 Test PFT light sul Monash con loss realismo --> PFT_light_SRx2_monashT.yml
+
 Test PFT-M sul Monash con loss classica --> PFT_M_SRx2_test.yml
+
 Test PFT-M sul DIV2K (da scaricare a parte) con loss bilanciato --> PFT_M_DIV2k_monash_test.yml
 
 
