@@ -1,3 +1,14 @@
+**Progetto relativo al corso di Computer Vision & Deepl Learnin, a.a. 2024/2025
+Docente Dott.ssa Migliorelli Lucia
+Tutor Dott. Galdelli Alessandro
+
+
+Studenti:
+Popa V. Gabriel
+Perugini Andrea
+Tassoni Niccolò**
+
+
 Guida ai train e test per ottenere i risultati conseguiti nel progetto.
 
 Per effettuare i **training** è necessario inserire nel terminale il seguente codice:
@@ -55,7 +66,7 @@ Test PFT-M sul DIV2K (da scaricare a parte) con loss bilanciato --> PFT_M_DIV2k_
 I risultati visivi dei test sono salvati automaticamente all'interno della cartella /results.
 
 
-
+**DI SEGUITO IL READ.ME ORIGINALE DELLA PFT**
 
 # [CVPR 2025] Progressive Focused Transformer for Single Image Super-Resolution
 
