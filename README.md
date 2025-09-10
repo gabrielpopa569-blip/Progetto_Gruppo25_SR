@@ -11,6 +11,7 @@ Tassoni Niccolò
 
 Guida ai train e test per ottenere i risultati conseguiti nel progetto.
 
+------------------------------------------------------------------------------------
 Per effettuare i **training** è necessario inserire nel terminale il seguente codice:
 python basicsr/train.py -opt options/train/NOME_FILE.yml
 
@@ -47,6 +48,7 @@ I risultati di tali training saranno salvati automaticamente all'interno della c
 
 **Per effettuare i test sui train effetuati è necessario copiare il path del modello (che si trova all'interno di experiments/models) ed inserirlo nel file di test .yml desiderato, alla voce 'pretrain_network_g'.**
 
+-----------------------------------------------------------------------------------
 Per effettuare i **testing** è necessario inserire nel terminale il seguente codice:
 python basicsr/test.py -opt options/test/NOME_FILE.yml
 
@@ -64,7 +66,7 @@ Test PFT-M sul DIV2K (da scaricare a parte) con loss bilanciato --> PFT_M_DIV2k_
 
 
 I risultati visivi dei test sono salvati automaticamente all'interno della cartella /results.
-
+----------------------------------------------------------------------------------------------
 
 **DI SEGUITO IL READ.ME ORIGINALE DELLA PFT**
 
