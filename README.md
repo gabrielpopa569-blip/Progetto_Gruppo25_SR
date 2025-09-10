@@ -1,3 +1,62 @@
+Guida ai train e test per ottenere i risultati conseguiti nel progetto.
+
+Per effettuare i **training** è necessario inserire nel terminale il seguente codice:
+python basicsr/train.py -opt options/train/NOME_FILE.yml
+
+dove al posto di NOME_FILE.yml si deve inserire il nome del file di training desiderato, collocato all'interno della cartella options/train.
+
+In particolare, se si desidera effettuare i training sviluppati nel progetti si deve inserire:
+
+Train PFT light sul Set5 --> PFT_light_SRx2_Set5_primotraining.yml 
+Train PFT sul Set5 --> PFT_SRx2_Set5_training.yml
+Train PFT light sul Monash con loss classica --> PFT_light_SRx2_Monash.yml
+Train PFT light sul Monash con loss bilanciato --> PFT_light_SRx2_Monash_bilanciato.yml
+Train PFT light sul Monash con loss realismo --> PFT_light_SRx2_Monash_realismo.yml
+Train PFT-M sul Monash con loss classica --> PFT_M_SRx2.yml
+Train PFT-M sul DIV2K (da scaricare a parte) con loss bilanciato --> PFT_M_SRx2_bilanciato.yml
+
+Se si desidera modificare la tipologia di loss, all'interno di ciascun file yml si deve scorrere fino ad incontrare 'pixel_opt' ed inserire:
+
+#Per la Loss L1
+  pixel_opt:
+    type: L1Loss
+    loss_weight: 1.0
+    reduction: mean
+
+#Per la Perceptual Loss + L1, variando i pesi delle due loss
+  pixel_opt:
+   type: L1VGGPerceptualLoss
+   l1_weight: 1.0
+   perceptual_weight: 1.0
+   reduction: mean
+
+
+
+I risultati di tali training saranno salvati automaticamente all'interno della cartella /experiments. Dentro il rispettivo taining effetutato si trova una cartella denominata /models dove si possono trovare i modelli salvati ogni 10k iterazioni. 
+
+**Per effettuare i test sui train effetuati è necessario copiare il path del modello (che si trova all'interno di experiments/models) ed inserirlo nel file di test .yml desiderato, alla voce 'pretrain_network_g'.**
+
+Per effettuare i **testing** è necessario inserire nel terminale il seguente codice:
+python basicsr/test.py -opt options/test/NOME_FILE.yml
+
+dove al posto di NOME_FILE.yml si deve inserire il nome del file di testing desiderato, collocato all'interno della cartella options/test.
+
+In particolare, se si desidera effettuare i testing sviluppati nel progetti si deve inserire:
+
+Test PFT light sul Set5 --> PFT_light_SRx2_Set5_primotraining.yml
+Test PFT sul Set5 --> PFT_SRx2_Set5_test.yml
+Test PFT light sul Monash con loss classica --> PFT_light_SRx2_monashT.yml
+Test PFT light sul Monash con loss bilanciato --> PFT_light_SRx2_monashT.yml
+Test PFT light sul Monash con loss realismo --> PFT_light_SRx2_monashT.yml
+Test PFT-M sul Monash con loss classica --> PFT_M_SRx2_test.yml
+Test PFT-M sul DIV2K (da scaricare a parte) con loss bilanciato --> PFT_M_DIV2k_monash_test.yml
+
+
+I risultati visivi dei test sono salvati automaticamente all'interno della cartella /results.
+
+
+
+
 # [CVPR 2025] Progressive Focused Transformer for Single Image Super-Resolution
 
 This repository is an official implementation of the paper "Progressive Focused Transformer for Single Image Super-Resolution", CVPR, 2025.

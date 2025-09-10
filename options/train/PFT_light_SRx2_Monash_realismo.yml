@@ -4,7 +4,7 @@
 
 
 # general settings
-name: PFT_light_SRx2_Monash_lossL1
+name: PFT_light_SRx2_Monash_realismo
 model_type: PFTModel
 scale: 2
 num_gpu: 1
@@ -36,8 +36,8 @@ datasets:
     pin_memory: True
     persistent_workers: True
 
-  val_0:
-    name: Monash_Guns_Dataset
+  val_1:
+    name: Monash_validation
     type: PairedImageDataset
     dataroot_gt: datasets/Monash_Guns_Dataset_Validation/HR
     dataroot_lq: datasets/Monash_Guns_Dataset_Validation/LR
@@ -112,12 +112,13 @@ path:
   strict_load_g: true
   resume_state: ~
 
+
 # training settings
 train:
   ema_decay: 0.999
   optim_g:
     type: AdamW
-    lr: !!float 2e-4   # nuovo LR (più stabile, visto che il modello ha già fatto 50k step)
+    lr: !!float 2e-4   
     weight_decay: 0
     betas: [0.9, 0.99]
 
@@ -130,16 +131,11 @@ train:
   total_iter: 400000     # totale training previsto
   warmup_iter: 2000       
 
-  #pixel_opt:
-  #  type: L1VGGPerceptualLoss
-  #  l1_weight: 1.0
-  #  perceptual_weight: 0
-  #  reduction: mean
-
   pixel_opt:
-    type: L1Loss
-    loss_weight: 1.0
-    reduction: mean
+   type: L1VGGPerceptualLoss
+   l1_weight: 0.4
+   perceptual_weight: 1.0
+   reduction: mean
 
 # validation settings
 val:

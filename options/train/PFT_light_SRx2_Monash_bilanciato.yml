@@ -1,6 +1,10 @@
+# GENERATE TIME: Mon Aug  4 21:51:31 2025
+# CMD:
+# basicsr/train.py -opt options/train/PFT_light_SRx2_Set5_primotraining.yml
+
 
 # general settings
-name: gabri_pft_SRx2_Set5train
+name: PFT_light_SRx2_Monash_bilanciato
 model_type: PFTModel
 scale: 2
 num_gpu: 1
@@ -12,11 +16,11 @@ find_unused_parameters: true
 # dataset and data loader settings
 datasets:
   train:
-    name: Set5
+    name: Monash_Guns_Dataset
     type: PairedImageDataset
-    dataroot_gt: HR/Set5/x2
-    dataroot_lq: LR/Set5/x2
-    filename_tmpl: '{}'
+    dataroot_gt: datasets/Monash_Guns_Dataset/HR
+    dataroot_lq: datasets/Monash_Guns_Dataset/LR
+    filename_tmpl: '{}x2'
     io_backend:
       type: disk
 
@@ -25,36 +29,44 @@ datasets:
     use_rot: true
 
     # data loader
-    num_worker_per_gpu: 4
-    batch_size_per_gpu: 5
+    num_worker_per_gpu: 8
+    batch_size_per_gpu: 8
     dataset_enlarge_ratio: 1
     prefetch_mode: cuda
     pin_memory: True
     persistent_workers: True
 
-  # val_1:
-  #  name: Set5
-  #  type: PairedImageDataset
-  #  dataroot_gt: datasets/TestDataSR/HR/Set5/x2
-  #  dataroot_lq: datasets/TestDataSR/LR/LRBI/Set5/x2
-  #  io_backend:
-  #    type: disk
+  val_1:
+    name: Monash_validation
+    type: PairedImageDataset
+    dataroot_gt: datasets/Monash_Guns_Dataset_Validation/HR
+    dataroot_lq: datasets/Monash_Guns_Dataset_Validation/LR
+    io_backend:
+      type: disk
 
-  # val_2:
-  #  name: Set14
-  #  type: PairedImageDataset
-  #  dataroot_gt: datasets/TestDataSR/HR/Set14/x2
-  #  dataroot_lq: datasets/TestDataSR/LR/LRBI/Set14/x2
-  #  io_backend:
-  #    type: disk
+  val_1:
+    name: Set5
+    type: PairedImageDataset
+    dataroot_gt: datasets/TestDataSR/HR/Set5/x2
+    dataroot_lq: datasets/TestDataSR/LR/LRBI/Set5/x2
+    io_backend:
+      type: disk
 
-  # val_3:
-  #  name: BSD100
-  #  type: PairedImageDataset
-  #  dataroot_gt: datasets/TestDataSR/HR/B100/x2
-  #  dataroot_lq: datasets/TestDataSR/LR/LRBI/B100/x2
-  #  io_backend:
-  #    type: disk
+  val_2:
+    name: Set14
+    type: PairedImageDataset
+    dataroot_gt: datasets/TestDataSR/HR/Set14/x2
+    dataroot_lq: datasets/TestDataSR/LR/LRBI/Set14/x2
+    io_backend:
+      type: disk
+
+  val_3:
+    name: BSD100
+    type: PairedImageDataset
+    dataroot_gt: datasets/TestDataSR/HR/B100/x2
+    dataroot_lq: datasets/TestDataSR/LR/LRBI/B100/x2
+    io_backend:
+      type: disk
 
   # val_4:
   #   name: Urban100
@@ -78,52 +90,52 @@ network_g:
   upscale: 2
   in_chans: 3
   img_size: 64
-  embed_dim: 240
-  depths: [4, 4, 4, 6, 6, 6]
-  num_heads: 6
-  num_topk: [ 1024, 1024, 1024, 1024,
+  embed_dim: 52
+  depths: [2, 4, 6, 6, 6]
+  num_heads: 4
+  num_topk: [1024, 1024,
               256, 256, 256, 256,
-              128, 128, 128, 128,
+              128, 128, 128, 128, 128, 128,
               64, 64, 64, 64, 64, 64,
-              32, 32, 32, 32, 32, 32,
-              16, 16, 16, 16, 16, 16,]
+              32, 32, 32, 32, 32, 32]
   window_size: 32
   convffn_kernel_size: 7
   img_range: 1.
-  mlp_ratio: 2.
-  upsampler: 'pixelshuffle'
+  mlp_ratio: 1
+  upsampler: 'pixelshuffledirect'
   resi_connection: '1conv'
   use_checkpoint: false
 
 # path
 path:
-  pretrain_network_g: ~  # path to the pre-trained network, if any
+  pretrain_network_g: ~
   strict_load_g: true
   resume_state: ~
+
 
 # training settings
 train:
   ema_decay: 0.999
   optim_g:
     type: AdamW
-    lr: !!float 2e-4
+    lr: !!float 2e-4   
     weight_decay: 0
     betas: [0.9, 0.99]
 
   scheduler:
     type: MultiStepLR
-    milestones: [250000, 400000, 450000, 475000, 490000]
+    milestones: [100000, 200000, 300000]
     gamma: 0.5
 
-  total_iter: 500000
-  warmup_iter: 20000
 
+  total_iter: 400000     # totale training previsto
+  warmup_iter: 2000       
 
-  # losses
   pixel_opt:
-    type: L1Loss
-    loss_weight: 1.0
-    reduction: mean
+   type: L1VGGPerceptualLoss
+   l1_weight: 1.0
+   perceptual_weight: 1.0
+   reduction: mean
 
 # validation settings
 val:
@@ -153,4 +165,5 @@ logger:
 # dist training settings
 dist_params:
   backend: nccl
+  port: 29500
   port: 29500

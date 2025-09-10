@@ -37,6 +37,14 @@ datasets:
     persistent_workers: True
 
   val_1:
+    name: Monash_validation
+    type: PairedImageDataset
+    dataroot_gt: datasets/Monash_Guns_Dataset_Validation/HR
+    dataroot_lq: datasets/Monash_Guns_Dataset_Validation/LR
+    io_backend:
+      type: disk
+
+  val_1:
     name: Set5
     type: PairedImageDataset
     dataroot_gt: datasets/TestDataSR/HR/Set5/x2

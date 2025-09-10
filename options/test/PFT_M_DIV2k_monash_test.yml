@@ -16,6 +16,13 @@ datasets:
     io_backend:
       type: disk
 
+  test_2:
+    name: Urban100
+    type: PairedImageDataset
+    dataroot_gt: datasets/TestDataSR/HR/Urban100/x2
+    dataroot_lq: datasets/TestDataSR/LR/LRBI/Urban100/x2
+    io_backend:
+      type: disk
 
  # test_5:
  #   name: Manga109
