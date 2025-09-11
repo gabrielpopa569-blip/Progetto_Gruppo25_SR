@@ -39,9 +39,9 @@ Sostituire NOME_FILE.yml con il file di configurazione desiderato, presente nell
 
  **Modifica della Loss**
 
-Per cambiare il tipo di loss, aprire il file .yml corrispondente, cercare la sezione pixel_opt e sostituire con una delle seguenti configurazioni:
+Per cambiare il tipo di loss, aprire il file .yml di train corrispondente, cercare la sezione pixel_opt e sostituire con una delle seguenti configurazioni:
 
-**Loss L1:**
+**Per usare Loss L1:**
 
 pixel_opt:
   type: L1Loss
@@ -49,7 +49,7 @@ pixel_opt:
   reduction: mean
 
 
-**Perceptual Loss + L1 (con pesi variabili):**
+**Per usare Perceptual Loss + L1 (con pesi variabili):**
 
 pixel_opt:
   type: L1VGGPerceptualLoss
@@ -61,9 +61,9 @@ pixel_opt:
 
 I risultati del training vengono salvati in /experiments.
 
-All’interno di ciascun training è presente la cartella /models con i modelli salvati ogni 10k iterazioni.
+All’interno di ciascun /experiments/NOME_TRAINING è presente la cartella /models con i modelli salvati ogni 10k iterazioni.
 
-Nel file .yml di test, inserire il percorso del modello pre-addestrato (presente in experiments/models) nella voce:
+Nel file .yml di test (leggere sotto per effettuare test), inserire il percorso del modello pre-addestrato (presente in experiments/models) nella voce:
 
 pretrain_network_g: <path_al_modello>
 
