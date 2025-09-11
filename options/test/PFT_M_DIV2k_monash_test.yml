@@ -10,8 +10,8 @@ datasets:
   test_1:
     name: Monash_Guns_Dataset
     type: PairedImageDataset
-    dataroot_gt: datasets/Monash_Guns_Dataset_Validation/HR
-    dataroot_lq: datasets/Monash_Guns_Dataset_Validation/LR
+    dataroot_gt: datasets/Monash_Guns_Dataset_Test/HR
+    dataroot_lq: datasets/Monash_Guns_Dataset_Test/LR
     filename_tmpl: '{}x2'
     io_backend:
       type: disk
